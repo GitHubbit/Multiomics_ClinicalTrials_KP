@@ -4,7 +4,7 @@ channels:
 dependencies:
   - blas=1.0=mkl
   - bottleneck=1.3.4=py39h67323c0_0
-  - ca-certificates=2022.3.29=hecd8cb5_0
+  - ca-certificates=2022.3.29=hecd8cb5_1
   - certifi=2021.10.8=py39hecd8cb5_2
   - intel-openmp=2021.4.0=hecd8cb5_3538
   - krb5=1.19.2=hcd88c3b_0
