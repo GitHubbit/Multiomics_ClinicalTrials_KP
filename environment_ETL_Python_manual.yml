@@ -2,7 +2,7 @@ name: ct_extract_env
 channels:
   - defaults
 dependencies:
-  - pip=21.2.4=py39hecd8cb5_0 
+  - pip
     - intel-openmp==2021.4.0=hecd8cb5_3538
     - sqlite==3.38.2=h707629a_0
     - libffi==3.3=hb1e8313_2
