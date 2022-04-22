@@ -3,7 +3,6 @@
 import os
 import pandas as pd
 # shell command: brew install postgresql 
-import pandas as pd
 import psycopg2
 import pandas.io.sql as sqlio
 
@@ -21,3 +20,5 @@ column_names = [desc[0] for desc in cursor.description]
 tuples = cursor.fetchall()
 con.close()
 df = pd.DataFrame(tuples, columns=column_names)
+
+print(df.head(5))
