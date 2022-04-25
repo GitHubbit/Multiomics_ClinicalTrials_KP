@@ -1,4 +1,0 @@
-name: environment_ETL_Python
-channels:
-  - defaults
-prefix: /Users/Kamileh/opt/anaconda3/envs/environment_ETL_Python
