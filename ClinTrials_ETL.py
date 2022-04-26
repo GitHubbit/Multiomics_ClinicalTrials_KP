@@ -7,12 +7,15 @@ import psycopg2
 import pandas.io.sql as sqlio
 
 import requests
+from bs4 import BeautifulSoup
 
+
+#####	----	****	----	----	****	----	----	****	----    #####
 
 # ACCESSING DATA BY DOWNLOADING STATIC COPY OF DATABASE, AND INSTALLING POSTGRESQL SOFTWARE TO THEN POPULATE DATABASE ON MACHINE
 # THEN CONNECTING TO DB
 
-# connect to DB and get the column names of the table
+connect to DB and get the column names of the table
 con = None
 con = psycopg2.connect(database="aact")
 con.rollback()
@@ -76,7 +79,6 @@ browse_interventions_df = browse_interventions_df.rename(columns={'downcase_mesh
 browse_conditions_df = browse_conditions_df.rename(columns={'downcase_mesh_term': 'Condition_MESH'})
 
 
-#
 print(browse_conditions_df.head(5).to_string())
 print(browse_interventions_df.head(5).to_string())
 
@@ -89,20 +91,19 @@ df = pd.merge(browse_conditions_df, browse_interventions_df, on='nct_id')
 print("\n\n\n")
 print(df.head(5).to_string())
 
-
-
-
-
-
-
-
-# print(browse_interventions_df.head(5))
-
-
-
+#####	----	****	----	----	****	----	----	****	----    #####
 
 
 # access data by downloading pipe-delimited flat files
 # url = "https://aact.ctti-clinicaltrials.org/pipe_files"
-# r = requests.get(url)
+# response = requests.get(url)
+# soup = BeautifulSoup(response.text, "lxml")
+
+
+
+# body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
+# for el in body:
+# 	link = el.find('a')
+# 	print(link)
+# 	print("\n")
 
