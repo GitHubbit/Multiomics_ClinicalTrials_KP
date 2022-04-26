@@ -6,8 +6,8 @@ import pandas as pd
 import psycopg2
 import pandas.io.sql as sqlio
 
-import requests
-from bs4 import BeautifulSoup
+# import requests
+# from bs4 import BeautifulSoup
 
 
 #####	----	****	----	----	****	----	----	****	----    #####
