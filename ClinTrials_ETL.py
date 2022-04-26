@@ -89,7 +89,7 @@ print(browse_interventions_df.head(5).to_string())
 df = pd.merge(browse_conditions_df, browse_interventions_df, on='nct_id')
 
 print("\n\n\n")
-print(df.head(5).to_string())
+print(df.head(1000).to_string())
 
 #####	----	****	----	----	****	----	----	****	----    #####
 
