@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 # ACCESSING DATA BY DOWNLOADING STATIC COPY OF DATABASE, AND INSTALLING POSTGRESQL SOFTWARE TO THEN POPULATE DATABASE ON MACHINE
 # THEN CONNECTING TO DB
 
-connect to DB and get the column names of the table
+# connect to DB and get the column names of the table
 con = None
 con = psycopg2.connect(database="aact")
 con.rollback()
