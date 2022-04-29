@@ -52,58 +52,59 @@ browse_interventions_df = pd.DataFrame(tuples, columns=column_names)
 
 con.close()
 
-# testing if dataframes successfully inhaled database data
-# print(conditions_df.head(5))
-# print(browse_conditions_df.head(5))
-# print(interventions_df.head(5).to_string())
 
-# prob best to stick to MESH terms since they're standardized, these are in the Browse_Conditions and Browse_Interventions tables
-# print(browse_conditions_df.head(5).to_string())
-# print(browse_interventions_df.head(5).to_string())
+# rename and drop df relevant columns to prepare for merging
+interventions_df = interventions_df.rename(columns={'id': 'int_id',
+                                                    'nct_id': 'int_nctid',
+                                                    'intervention_type': 'int_type',
+                                                    'name': 'int_name',
+                                                    'description': 'int_description'})
+interventions_df = interventions_df.drop(columns=['int_id', 'int_description'])
+conditions_df = conditions_df.rename(columns={'id': 'con_id',
+                                              'nct_id': 'con_nctid',
+                                              'name': 'con_name',
+                                              'downcase_name': 'con_downcase_name'})
+conditions_df = conditions_df.drop(columns=['con_id', 'con_name'])
+browse_interventions_df = browse_interventions_df.rename(columns={'id': 'browseint_id',
+                                                                  'nct_id': 'browseint_nctid',
+                                                                  'mesh_term': 'browseint_meshterm',
+                                                                  'downcase_mesh_term': 'browseint_meshterm_downcase',
+                                                                  'mesh_type': 'browseint_meshtype'})
 
-# see list of unique MESH conditions
-unique_cond = browse_conditions_df.downcase_mesh_term.unique()
-# print(*(sorted(unique_cond)), sep = "\n")
+browse_interventions_df = browse_interventions_df.drop(columns=['browseint_id', 'browseint_meshterm'])
+browse_conditions_df = browse_conditions_df.rename(columns={'id': 'browsecon_id',
+                                                            'nct_id': 'browsecon_nctid',
+                                                            'mesh_term': 'browsecon_meshterm',
+                                                            'downcase_mesh_term': 'browsecon_meshterm_downcase',
+                                                            'mesh_type': 'browsecon_meshtype'})
+browse_conditions_df = browse_conditions_df.drop(columns=['browsecon_id', 'browsecon_meshterm'])                                                                                                                          
 
-# see list of unique MESH interventions
-unique_int = browse_interventions_df.downcase_mesh_term.unique()
-# print(*(sorted(unique_int)), sep = "\n")
+# merge conditions_df and interventions_df since they have relevant terms 
+df = pd.merge(conditions_df, interventions_df, left_on='con_nctid', right_on = 'int_nctid')
+df_dedup = df.drop_duplicates(subset = ['con_downcase_name', 'int_name'],
+                                      keep = 'first').reset_index(drop = True)
 
-# need to link condition MESH terms to intervention MESH terms via NCT ID
-# get dfs ready
-
-browse_interventions_df = browse_interventions_df.drop(columns=['id', 'mesh_term', 'mesh_type'])
-browse_conditions_df = browse_conditions_df.drop(columns=['id', 'mesh_term', 'mesh_type'])
-# rename columns called "MESH term"...otherwise when merging later we will get 2 columns in merged table with identical name
-browse_interventions_df = browse_interventions_df.rename(columns={'downcase_mesh_term': 'Intervention_MESH'})
-browse_conditions_df = browse_conditions_df.rename(columns={'downcase_mesh_term': 'Condition_MESH'})
-
-
-print(browse_conditions_df.head(5).to_string())
-print(browse_interventions_df.head(5).to_string())
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+#     display(df_dedup.head(100))
 
 
-# performing right outer join, where the left table contains conditions, and the right interventions
-# I only want to preserve conditions in the table for which an intervention exists
+with pd.option_context('expand_frame_repr', False, 'display.max_rows', None):
+	print(df_dedup[['con_nctid', 'con_downcase_name', 'int_name']].head(100))
 
-df = pd.merge(browse_conditions_df, browse_interventions_df, on='nct_id')
 
-print("\n\n\n")
-print(df.head(1000).to_string())
+df_dedup[['con_downcase_name', 'int_name']].to_csv('ClinTrials_KG_nodes.csv', sep ='\t', index=False)
+
+
+
+
+
+
+
+
+
+
+
 
 #####	----	****	----	----	****	----	----	****	----    #####
 
-
-# access data by downloading pipe-delimited flat files
-# url = "https://aact.ctti-clinicaltrials.org/pipe_files"
-# response = requests.get(url)
-# soup = BeautifulSoup(response.text, "lxml")
-
-
-
-# body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
-# for el in body:
-# 	link = el.find('a')
-# 	print(link)
-# 	print("\n")
 
