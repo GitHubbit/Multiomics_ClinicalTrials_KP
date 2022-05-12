@@ -5,6 +5,7 @@ import pandas as pd
 # shell command: brew install postgresql 
 import psycopg2
 import pandas.io.sql as sqlio
+from config import API_KEY
 
 # import requests
 # from bs4 import BeautifulSoup
@@ -92,9 +93,17 @@ with pd.option_context('expand_frame_repr', False, 'display.max_rows', None):
 	print(df_dedup[['con_nctid', 'con_downcase_name', 'int_name']].head(100))
 
 
-df_dedup[['con_downcase_name', 'int_name']].to_csv('ClinTrials_KG_nodes.csv', sep ='\t', index=False)
+# df_dedup[['con_downcase_name', 'int_name']].to_csv('ClinTrials_KG_nodes.csv', sep ='\t', index=False)
 
+# the boss wants to see the properly formatted .tsv file output first, even if it's filled with dummy data...
 
+# first get only relevant columns from DB
+ct_extract = pd.DataFrame(df_dedup[['con_nctid', 'con_downcase_name', 'int_type', 'int_name']])
+ct_extract = ct_extract.rename(columns={'con_nctid': 'nctid'})
+# get CURIE column for nct_id column (https://bioregistry.io/registry/clinicaltrials)
+
+ct_extract['nctid_curie'] = ct_extract['nctid']
+ct_extract['nctid_curie'] = 'clinicaltrials:' + ct_extract['nctid'].astype(str)
 
 
 
