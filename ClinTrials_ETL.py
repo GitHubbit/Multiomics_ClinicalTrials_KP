@@ -8,6 +8,16 @@ import pandas.io.sql as sqlio
 from config import API_KEY
 from time import sleep
 import re
+import sys
+
+# adding Folder_2/subfolder to the system path
+sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')
+from pymetamap import MetaMap
+
+# uncomment when switching to Linux
+# sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap/pymetamap')
+# from pymetamap import MetaMap
+
 
 # import requests
 # from bs4 import BeautifulSoup
@@ -161,90 +171,75 @@ def select_cols_to_preprocess(ct_preprocessed):
     return(processed_ct_cols)
     
 
-
-
-    # while ascii_flag:
-    #     for condition in conditions:
-    #         if condition.isascii():
-
-
-
-
-
-        # if not condition.isascii():
-        #     print("Non-ASCII chars are detected in Conditions col from ClinTrial (not checking other cols), proceed with text processing")
-        #     # process lists to remove non-ascii chars (this is not required for MetaMap 2020!!!!)
-        #     conditions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in conditions)
-        #     interventions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in interventions)
-        #     processed_ct_cols.append(("conditions", conditions_translated))
-        #     processed_ct_cols.append(("interventions", interventions_translated))
-        #     break
-        # else:
-        #     print("All ASCII char, no text processing required")
-        #     processed_ct_cols.append(("conditions", conditions))
-        #     processed_ct_cols.append(("interventions", interventions))
-            # break  
-
-    # print(processed_ct_cols)
-
-
-
-
-    # if any(0 <= ord(char) <= 127 for char in condition for condition in conditions): # note we're only checking the Conditions col
-    #     print("Non-ASCII chars are detected in Conditions col from ClinTrial (not checking other cols), proceed with text processing")
-    #     # process lists to remove non-ascii chars (this is not required for MetaMap 2020!!!!)
-    #     conditions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in conditions)
-    #     interventions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in interventions)
-    #     processed_ct_cols.append(("conditions", conditions_translated))
-    #     processed_ct_cols.append(("interventions", interventions_translated))
-    # else:
-    #     print("All ASCII char, no text processing required")
-    #     processed_ct_cols.append(("conditions", conditions))
-    #     processed_ct_cols.append(("interventions", interventions))  
-
-    # print(processed_ct_cols)
-    # return(processed_ct_cols)
-    #     # # process lists to remove non-ascii chars (this is not required for MetaMap 2020!!!!)
-    # conditions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in conditions)
-    # interventions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in interventions)
-
-
-    # conditions_translated = ("conditions", conditions_translated)
-    # print(conditions_translated[1])
-    # interventions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in interventions)
-
-
-    # de_ascii_lists.append({"conditions", conditions_translated})
-    # de_ascii_lists.append({"interventions", interventions_translated})
-
-
-
 def preprocess_cols_for_metamap(text):
     non_ascii = "[^\x00-\x7F]"
     pattern = re.compile(r"[^\x00-\x7F]")
     non_ascii_text = re.sub(pattern, ' ', text)
     return non_ascii_text
 
-# # setup MetaMap
-# def prep_for_metamap():
-#     # Setup UMLS Server
-#     metamap_base_dir = '/gwshare/umls_2021/metamap/public_mm/'
-#     metamap_bin_dir = 'bin/metamap20'
-#     metamap_pos_server_dir = 'bin/skrmedpostctl'
-#     metamap_wsd_server_dir = 'bin/wsdserverctl'
+# setup MetaMap
+def start_metamap_servers():
 
-#     # Start servers
-#     os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
-#     os.system(metamap_base_dir + metamap_wsd_server_dir + ' start') # Word sense disambiguation 
+    # uncomment when switching to Linux
 
-#     # Sleep a bit to give time for these servers to start up
-#     sleep(20)
+    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
+    # # Setup UMLS Server
+    # metamap_base_dir = '/users/knarsinh/projects/clinical_trials/metamap/public_mm/'
+    # metamap_bin_dir = 'bin/metamap20'
+    # metamap_pos_server_dir = 'bin/skrmedpostctl'
+    # metamap_wsd_server_dir = 'bin/wsdserverctl'
+
+    # # Start servers
+    # os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
+    # os.system(metamap_base_dir + metamap_wsd_server_dir + ' start') # Word sense disambiguation 
+     
+    # # Sleep a bit to give time for these servers to start up
+    # sleep(40)
+    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
+
+    # Setup UMLS Server
+    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
+    metamap_bin_dir = 'bin/metamap18'
+    metamap_pos_server_dir = 'bin/skrmedpostctl'
+    metamap_wsd_server_dir = 'bin/wsdserverctl'
+
+    # Start servers
+    os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
+    os.system(metamap_base_dir + metamap_wsd_server_dir + ' start') # Word sense disambiguation 
+     
+    # # Sleep a bit to give time for these servers to start up
+    sleep(60)
+
+def stop_metamap_servers():
+    
+    # Uncomment when switching to Linux
+    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
+    # # Stop MetaMap servers
+    # metamap_base_dir = '/users/knarsinh/projects/clinical_trials/metamap/public_mm/'
+    # metamap_bin_dir = 'bin/metamap20'
+    # metamap_pos_server_dir = 'bin/skrmedpostctl'
+    # metamap_wsd_server_dir = 'bin/wsdserverctl'
+
+    # # Start servers
+    # os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
+    # os.system(metamap_base_dir + metamap_wsd_server_dir + ' stop') # Word sense disambiguation 
+    
+    # # Sleep a bit to give time for these servers to start up
+    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
+
+    # Setup UMLS Server
+    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
+    metamap_bin_dir = 'bin/metamap18'
+    metamap_pos_server_dir = 'bin/skrmedpostctl'
+    metamap_wsd_server_dir = 'bin/wsdserverctl'
+
+    # Start servers
+    os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
+    os.system(metamap_base_dir + metamap_wsd_server_dir + ' stop') # Word sense disambiguation 
 
 
 # def run_metamap():
 #     pass
-
-
 
 
 
@@ -254,13 +249,22 @@ def driver():
     #     display(df_dedup.head(100))
     ct_data = get_trial_data()
     ct_preprocessed = preprocess_ct_data(ct_data)
-    select_cols_to_preprocess(ct_preprocessed)
+    ct_processed_cols = select_cols_to_preprocess(ct_preprocessed)
+    start_metamap_servers()
 
-    # translated_lists = select_cols_to_preprocess(ct_preprocessed)
-    # print(translated_lists)
+    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
+    metamap_bin_dir = 'bin/metamap18'
+    mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
+    sents = ['myocardial infarction']  # this has to be 1 sentence
+    concepts,error = mm.extract_concepts(sents)
+    for concept in concepts:
+        print(concept)
+        print("\n")
 
-    # preprocess_cols_for_metamap(ct_preprocessed)
-    # prep_for_metamap(ct_preprocessed)
+
+    # run_metamap()
+
+
 
     # # print(ct_preprocessed.head(20))
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
