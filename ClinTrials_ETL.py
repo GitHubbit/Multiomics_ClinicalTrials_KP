@@ -9,6 +9,9 @@ from config import API_KEY
 from time import sleep
 import re
 import sys
+import multiprocessing
+import pickle
+import json
 
 # adding Folder_2/subfolder to the system path
 sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')
@@ -21,6 +24,14 @@ from pymetamap import MetaMap
 
 # import requests
 # from bs4 import BeautifulSoup
+
+
+
+# Setup UMLS Server global vars
+metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
+metamap_bin_dir = 'bin/metamap18'
+metamap_pos_server_dir = 'bin/skrmedpostctl'
+metamap_wsd_server_dir = 'bin/wsdserverctl'
 
 
 #####	----	****	----	----	****	----	----	****	----    #####
@@ -141,8 +152,8 @@ def preprocess_ct_data(ct_data):
 def select_cols_to_preprocess(ct_preprocessed):
     # prep a list to hold dicts of de-asciied cols from the ClinTrials df
     processed_ct_cols = []
-    conditions_metamap_compatible = {}
-    interventions_metamap_compatible = {}
+    metamap_compatible = {}
+    
 
     # get unique lists of the concepts to MetaMap from the ClinTrials df
     conditions = list(set(list(ct_preprocessed['subject_name'])))
@@ -155,20 +166,15 @@ def select_cols_to_preprocess(ct_preprocessed):
         conditions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in conditions)
         interventions_translated = dict((i, preprocess_cols_for_metamap(i)) for i in interventions)
         
-        conditions_metamap_compatible["conditions"] = conditions_translated
-        interventions_metamap_compatible["interventions"] = interventions_translated
+        metamap_compatible["conditions"] = conditions_translated
+        metamap_compatible["interventions"] = interventions_translated
 
-        processed_ct_cols.append(conditions_metamap_compatible)
-        processed_ct_cols.append(interventions_metamap_compatible)
     else:
-        print("No non-ASCII chars detected, no text processing required")
-        conditions_metamap_compatible["conditions"] = conditions
-        interventions_metamap_compatible["interventions"] = interventions
+        print("No non-ASCII chars detected or they are present, but we're not using MetaMap versions prior to 2020, no text processing required")
+        metamap_compatible["conditions"] = conditions
+        metamap_compatible["interventions"] = interventions
 
-        processed_ct_cols.append(conditions_metamap_compatible)
-        processed_ct_cols.append(interventions_metamap_compatible)
-
-    return(processed_ct_cols)
+    return(metamap_compatible)
     
 
 def preprocess_cols_for_metamap(text):
@@ -183,11 +189,6 @@ def start_metamap_servers():
     # uncomment when switching to Linux
 
     #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
-    # # Setup UMLS Server
-    # metamap_base_dir = '/users/knarsinh/projects/clinical_trials/metamap/public_mm/'
-    # metamap_bin_dir = 'bin/metamap20'
-    # metamap_pos_server_dir = 'bin/skrmedpostctl'
-    # metamap_wsd_server_dir = 'bin/wsdserverctl'
 
     # # Start servers
     # os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
@@ -197,11 +198,6 @@ def start_metamap_servers():
     # sleep(40)
     #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
 
-    # Setup UMLS Server
-    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
-    metamap_bin_dir = 'bin/metamap18'
-    metamap_pos_server_dir = 'bin/skrmedpostctl'
-    metamap_wsd_server_dir = 'bin/wsdserverctl'
 
     # Start servers
     os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
@@ -214,11 +210,6 @@ def stop_metamap_servers():
     
     # Uncomment when switching to Linux
     #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
-    # # Stop MetaMap servers
-    # metamap_base_dir = '/users/knarsinh/projects/clinical_trials/metamap/public_mm/'
-    # metamap_bin_dir = 'bin/metamap20'
-    # metamap_pos_server_dir = 'bin/skrmedpostctl'
-    # metamap_wsd_server_dir = 'bin/wsdserverctl'
 
     # # Start servers
     # os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
@@ -227,49 +218,121 @@ def stop_metamap_servers():
     # # Sleep a bit to give time for these servers to start up
     #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
 
-    # Setup UMLS Server
-    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
-    metamap_bin_dir = 'bin/metamap18'
-    metamap_pos_server_dir = 'bin/skrmedpostctl'
-    metamap_wsd_server_dir = 'bin/wsdserverctl'
-
-    # Start servers
+    # Stop servers
     os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
     os.system(metamap_base_dir + metamap_wsd_server_dir + ' stop') # Word sense disambiguation 
 
 
-# def run_metamap():
-#     pass
+def run_metamap(input_term, source_restriction):
+    mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
+    concepts_dict = dict()
+    if all(x is None for x in source_restriction):
+        try:
+            concepts,error = mm.extract_concepts([input_term],
+                                                 word_sense_disambiguation = True,
+                                                 prune = 10,
+                                                 composite_phrase = 1)
+            concepts_dict[input_term] = concepts
+        except:
+            concepts_dict[input_term] = None 
+    else:
+        try:
+            concepts,error = mm.extract_concepts([input_term],
+                                                 word_sense_disambiguation = True,
+                                                 restrict_to_sources=source_restriction,
+                                                 prune = 10,
+                                                 composite_phrase = 1)
+            concepts_dict[input_term] = concepts
+        except:
+            concepts_dict[input_term] = None 
+    return(concepts_dict)
 
+
+def write_output_out(output_to_store):
+    # CAREFUL: Running WILL OVERWRITE METAMAPPED DISEASES AND INTERVENTIONS FILES, WHICH TAKE FOREVER TO GENERATE!
+
+    # write mapped diseases and interventions to pickle file
+    with open('metamapped_conditions.txt', 'wb') as file:
+        pickle.dump(output_to_store.get("conditions"), file)
+    with open('metamapped_interventions.txt', 'wb') as file:
+        pickle.dump(output_to_store.get("interventions"), file)
+
+    # write mapped diseases and interventions to human readable file
+    with open('readable_metamapped_conditions.txt', 'w') as file:
+        file.write(json.dumps(output_to_store.get("conditions"), indent=4))
+    with open('readable_metamapped_interventions.txt', 'w') as file:
+        file.write(json.dumps(output_to_store.get("interventions"), indent=4))
+
+
+    # # write to pickle file
+    # with open('metamapped_conditions.txt', 'wb') as file:
+    #     pickle.dump(output_to_store, file)
+
+    # # write to human readable file
+    # with open('readable_metamapped_conditions.txt', 'w') as file:
+    #     file.write(json.dumps(output_to_store, indent=4))
 
 
 
 def driver():
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
     #     display(df_dedup.head(100))
+    metamapped_dict = {}
+
     ct_data = get_trial_data()
     ct_preprocessed = preprocess_ct_data(ct_data)
-    ct_processed_cols = select_cols_to_preprocess(ct_preprocessed)
+    ct_processed = select_cols_to_preprocess(ct_preprocessed)
+    # ct_processed.get("conditions")
+    # ct_processed.get("interventions")
     start_metamap_servers()
+    
+    import random
+    conditions_proc = dict(random.sample(ct_processed.get("conditions").items(), 20))
+    interventions_proc = dict(random.sample(ct_processed.get("conditions").items(), 20))
 
-    metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
-    metamap_bin_dir = 'bin/metamap18'
-    mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
-    sents = ['myocardial infarction']  # this has to be 1 sentence
-    concepts,error = mm.extract_concepts(sents)
-    for concept in concepts:
-        print(concept)
-        print("\n")
+    # print(conditions_proc.values())
+
+    # print(ct_processed.get("conditions").values())
+    # print(type(ct_processed.get("conditions").values()))
+
+    metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
+        zip(list(conditions_proc.values()),
+            [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(conditions_proc.values()))))
+    metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
+                                                                             zip(list(interventions_proc.values()),
+                                                                                 [[None]]*len(list(interventions_proc.values()))))
+    stop_metamap_servers()
+    metamapped_dict["conditions"] = metamapped_conditions
+    metamapped_dict["interventions"] = metamapped_interventions
+
+    # print(metamapped_dict.get("conditions"))
 
 
-    # run_metamap()
 
 
 
-    # # print(ct_preprocessed.head(20))
+
+    # UNCOMMENT TO RUN ON FULL DATASET
+    # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
+    #     zip(list(ct_processed.get("conditions").values()),
+    #         [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(ct_processed.get("conditions").values()))))
+
+    # metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
+    #     zip(list(ct_processed.get("interventions").values()),
+    #         [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(ct_processed.get("interventions").values()))))
+
+    
+    write_output_out(metamapped_dict)
+
+    # print(metamapped_conditions)
+
+
+
+
+
+
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
     #     print(ct_preprocessed.head(20))
-    # # mapper(ct_preprocessed)
 
 
 driver()
