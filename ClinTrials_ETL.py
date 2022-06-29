@@ -306,7 +306,7 @@ def driver():
     conditions_proc = random.sample(list(ct_processed.get("conditions").items()), k=50)
     interventions_proc = random.sample(list(ct_processed.get("interventions").items()), k=50)
 
-    print(type(conditions_proc))
+    print(conditions_proc)
 
 
 
