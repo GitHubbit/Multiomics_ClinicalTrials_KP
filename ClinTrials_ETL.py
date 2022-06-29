@@ -304,12 +304,12 @@ def driver():
     # interventions_proc = dict(random.sample(ct_processed.get("interventions").items(), 2000)) # deprecated in Python 3.9+
 
     keys = random.sample(list(ct_processed.get("conditions").items()), 2000)
-    values = [ct_processed.get("conditions").items()[k] for k in keys]
+    values = [ct_processed.get("conditions")[k] for k in keys]
     conditions_proc = dict(zip(keys, values))
 
-    keys = random.sample(list(ct_processed.get("interventions"), 2000)
-    values = [ct_processed.get("interventions")[k] for k in keys]
-    interventions_proc = dict(zip(keys, values))
+    keys = random.sample(list(ct_processed.get("conditions").items()), 2000)
+    values = [ct_processed.get("conditions")[k] for k in keys]
+    conditions_proc = dict(zip(keys, values))
 
     # print(conditions_proc.values())
 
