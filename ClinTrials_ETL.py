@@ -307,8 +307,8 @@ def driver():
     values = [ct_processed.get("conditions").items()[k] for k in keys]
     conditions_proc = dict(zip(keys, values))
 
-    keys = random.sample(list(ct_processed.get("interventions").items()), 2000)
-    values = [ct_processed.get("interventions").items()[k] for k in keys]
+    keys = random.sample(list(ct_processed.get("interventions"), 2000)
+    values = [ct_processed.get("interventions")[k] for k in keys]
     interventions_proc = dict(zip(keys, values))
 
     # print(conditions_proc.values())
