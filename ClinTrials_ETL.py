@@ -5,7 +5,7 @@ import pandas as pd
 # shell command: brew install postgresql 
 import psycopg2
 import pandas.io.sql as sqlio
-from config import API_KEY
+# from config import API_KEY
 from time import sleep
 import re
 import sys
