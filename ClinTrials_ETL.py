@@ -16,7 +16,9 @@ from itertools import repeat
 
 
 # adding Folder_2/subfolder to the system path
-sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')
+# sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')  # for running on local
+sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap')
+
 from pymetamap import MetaMap
 
 # uncomment when switching to Linux
@@ -28,9 +30,9 @@ from pymetamap import MetaMap
 # from bs4 import BeautifulSoup
 
 
-
 # Setup UMLS Server global vars
-metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/'
+# metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
+metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm"
 metamap_bin_dir = 'bin/metamap18'
 metamap_pos_server_dir = 'bin/skrmedpostctl'
 metamap_wsd_server_dir = 'bin/wsdserverctl'
