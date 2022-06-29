@@ -300,11 +300,9 @@ def driver():
     start_metamap_servers()
     
     import random
-    # conditions_proc = dict(random.sample(ct_processed.get("conditions").items(), 2000))   # deprecated in Python 3.9+
-    # interventions_proc = dict(random.sample(ct_processed.get("interventions").items(), 2000)) # deprecated in Python 3.9+
 
-    conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=2000))
-    interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=2000))
+    # conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=2000))  # uncomment for testing on subset
+    # interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=2000)) # uncomment for testing on subset
 
     # print(conditions_proc)
 
@@ -315,12 +313,21 @@ def driver():
     # print(ct_processed.get("conditions").values())
     # print(type(ct_processed.get("conditions").values()))
 
+    # uncomment below to run on subset of dicts (see random sampling above)
+
+    # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
+    #     zip(list(conditions_proc.values()),
+    #         [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(conditions_proc.values()))))
+    # metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
+    #                                                                          zip(list(interventions_proc.values()),
+    #                                                                              [[None]]*len(list(interventions_proc.values()))))
+
     metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
-        zip(list(conditions_proc.values()),
-            [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(conditions_proc.values()))))
+        zip(list(ct_processed.get("conditions").values()),
+            [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(ct_processed.get("conditions").values()))))
     metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
-                                                                             zip(list(interventions_proc.values()),
-                                                                                 [[None]]*len(list(interventions_proc.values()))))
+                                                                             zip(list(ct_processed.get("interventions").values()),
+                                                                                 [[None]]*len(list(ct_processed.get("interventions").values()))))
 
     # UNCOMMENT TO RUN ON FULL DATASET
     # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
