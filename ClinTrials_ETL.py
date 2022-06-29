@@ -303,13 +303,10 @@ def driver():
     # conditions_proc = dict(random.sample(ct_processed.get("conditions").items(), 2000))   # deprecated in Python 3.9+
     # interventions_proc = dict(random.sample(ct_processed.get("interventions").items(), 2000)) # deprecated in Python 3.9+
 
-    keys = random.sample(list(ct_processed.get("conditions").items()), 2000)
-    values = [ct_processed.get("conditions")[k] for k in keys]
-    conditions_proc = dict(zip(keys, values))
+    conditions_proc = random.sample(list(ct_processed.get("conditions").items()), k=50)
+    interventions_proc = random.sample(list(ct_processed.get("interventions").items()), k=50)
 
-    keys = random.sample(list(ct_processed.get("conditions").items()), 2000)
-    values = [ct_processed.get("conditions")[k] for k in keys]
-    conditions_proc = dict(zip(keys, values))
+
 
     # print(conditions_proc.values())
 
@@ -393,7 +390,7 @@ def driver():
     # print(intervention_curie_dict)
 
     ct_final_mapped = ct_preprocessed.copy()
-    print(ct_final_mapped[:10])
+    # print(ct_final_mapped[:10])
     ct_final_mapped['subject'] = ct_preprocessed['subject_name'].map(condition_curie_dict)
     ct_final_mapped['object'] = ct_preprocessed['object_name'].map(intervention_curie_dict)
 
