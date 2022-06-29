@@ -17,7 +17,7 @@ from itertools import repeat
 
 # adding Folder_2/subfolder to the system path
 # sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')  # for running on local
-sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap')
+sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap')
 
 from pymetamap import MetaMap
 
