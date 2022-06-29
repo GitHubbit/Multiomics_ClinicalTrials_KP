@@ -25,10 +25,8 @@ from pymetamap import MetaMap
 # sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap/pymetamap')
 # from pymetamap import MetaMap
 
-
 # import requests
 # from bs4 import BeautifulSoup
-
 
 # Setup UMLS Server global vars
 # metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
