@@ -303,8 +303,8 @@ def driver():
     # conditions_proc = dict(random.sample(ct_processed.get("conditions").items(), 2000))   # deprecated in Python 3.9+
     # interventions_proc = dict(random.sample(ct_processed.get("interventions").items(), 2000)) # deprecated in Python 3.9+
 
-    conditions_proc = random.sample(list(ct_processed.get("conditions").items()), 2)
-    interventions_proc = random.sample(list(ct_processed.get("interventions").items()), 2)
+    conditions_proc = random.sample(list(ct_processed.get("conditions").items()), 2000)
+    interventions_proc = random.sample(list(ct_processed.get("interventions").items()), 2000)
 
     # print(conditions_proc.values())
 
