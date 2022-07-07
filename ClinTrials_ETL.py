@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+# #!/usr/bin/env python3
+#!/usr/bin/env conda run -n ct_extract_env python
 
 import os
 import pandas as pd
@@ -141,7 +142,7 @@ def preprocess_ct_data(ct_data):
     ct_final = pd.DataFrame(columns=['subject','predicate','object', 'subject_name','object_name','category'])
 
     ct_final['subject'] = 'condition:' + ct_extract['con_downcase_name'].astype(str)
-    ct_final['predicate'] = 'biolink:hypothesized_for'
+    ct_final['predicate'] = 'biolink:related_to'
     ct_final['object'] = 'intervention:' + ct_extract['int_name'].astype(str)   # this will not all be RxNorm CURIEs since some interventions are not drugs
     ct_final.subject_name = ct_extract.con_downcase_name
     ct_final.object_name = ct_extract.int_name
