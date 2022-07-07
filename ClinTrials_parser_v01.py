@@ -1,10 +1,10 @@
-#!/usr/bin/env conda run -n ct_extract_env python3
+#!/usr/bin/env conda run -n ct_extract_env python
 
 
 import pandas as pd
 import json
 
-edges = pd.read_csv("ClinTrials_KG_edges_v01_master.csv", sep='\t')
+edges = pd.read_csv("ClinTrials_KG_edges_v01_1.csv", sep='\t')
 
 with open('parser_output.txt', 'w') as file:
     for index, row in edges.iterrows():
