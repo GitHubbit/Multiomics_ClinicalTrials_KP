@@ -1,4 +1,4 @@
-#!/usr/bin/env conda run -n ct_extract_env python
+#!/usr/bin/env conda run -n ct_extract_env python3
 
 
 import pandas as pd
