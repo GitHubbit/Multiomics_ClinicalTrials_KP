@@ -7,7 +7,7 @@ import json
 edges = pd.read_csv("ClinTrials_KG_edges_v01_1.csv", sep='\t')
 
 with open('parser_output.txt', 'w') as file:
-    for index, row in edges_test.iterrows():
+    for index, row in edges.iterrows():
         id_dict = {}
         subject_dict = {}
         association_dict = {}
