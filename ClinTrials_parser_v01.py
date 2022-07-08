@@ -7,7 +7,7 @@ import json
 edges = pd.read_csv("ClinTrials_KG_edges_v01_1.csv", sep='\t')
 
 with open('parser_output.txt', 'w') as file:
-    for index, row in edges.iterrows():
+    for index, row in edges_test.iterrows():
         id_dict = {}
         subject_dict = {}
         association_dict = {}
@@ -19,7 +19,7 @@ with open('parser_output.txt', 'w') as file:
         subject_dict["{}".format(row["subject"].split(':')[0])] = "{}".format(row["subject"].split(':')[1])
         
         subject_dict["name"] = row["subject_name"]
-        subject_dict["{}_semantic_types".format(row["subject"].split(':')[0])] = "TBD" # fix in next version        
+#         subject_dict["{}_semantic_types".format(row["subject"].split(':')[0])] = "TBD" # fix in next version        
         
         subject_dict["type"] = "Disease"
 
@@ -31,10 +31,10 @@ with open('parser_output.txt', 'w') as file:
          "value":"infores:clinicaltrials"})
         association_dict["edge_attributes"].append({"attribute_type_id":"clinicaltrials_id","value":row["nctid"]})
 
-        object_dict["{}".format(row["object"].split(':')[0])] = row["object"]
+        object_dict["{}".format(row["object"].split(':')[0])] = "{}".format(row["object"].split(':')[1])
         object_dict["name"] = row["object_name"]
         object_dict["type"] = "Treatment"
-        object_dict["{}_semantic_types".format(row["object"].split(':')[0])] = "TBD" # fix in next version
+#         object_dict["{}_semantic_types".format(row["object"].split(':')[0])] = "TBD" # fix in next version
 
         id_dict["subject"] = subject_dict
         id_dict["association"] = association_dict
@@ -44,3 +44,5 @@ with open('parser_output.txt', 'w') as file:
         file.write('\n')
     
         # print(json.dumps(id_dict, indent=2))
+  
+    
