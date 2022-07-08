@@ -422,8 +422,8 @@ def driver():
 
     # write nodes and edges files
 
-    ct_final_mapped.to_csv('ClinTrials_KG_edges_v01.csv', sep ='\t', index=False)
-    ct_nodes.to_csv('ClinTrials_KG_nodes_v01.csv', sep ='\t', index=False)
+    ct_final_mapped.to_csv('ClinTrials_KG_edges_v01_2.csv', sep ='\t', index=False)
+    ct_nodes.to_csv('ClinTrials_KG_nodes_v01_2.csv', sep ='\t', index=False)
 
 
 
