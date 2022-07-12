@@ -14,6 +14,8 @@ import multiprocessing
 import pickle
 import json
 from itertools import repeat
+import urllib
+import zipfile
 
 
 # adding Folder_2/subfolder to the system path
@@ -43,46 +45,61 @@ metamap_wsd_server_dir = 'bin/wsdserverctl'
 # ACCESSING DATA BY DOWNLOADING STATIC COPY OF DATABASE, AND INSTALLING POSTGRESQL SOFTWARE TO THEN POPULATE DATABASE ON MACHINE
 # THEN CONNECTING TO DB
 
+def latest_date_download():
+    url = "https://aact.ctti-clinicaltrials.org/pipe_files"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text)
+    upload_dates = []
+    zip_files = []
+    links = []
+    body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
+    for el in body:
+        tags = el.find('a')
+        try:
+            if 'href' in tags.attrs:   # looking for href inside anchor tag    
+                link = "https://aact.ctti-clinicaltrials.org" + tags.get('href')
+                links.append(link)
+                last_upload = link.split("/")[-1]
+                zip_files.append(last_upload)
+                date_upload = last_upload.split("_")[0]
+                upload_dates.append(date_upload)    # appending link to list of links
+        except:    # pass if list missing anchor tag or anchor tag does not has a href params 
+            pass
+
+    upload_dates = [dt.datetime.strptime(date, '%Y%m%d').date() for date in upload_dates] # convert all strings in list into datetime objects
+    print(upload_dates)
+
+    latest_file_date = max(upload_dates)
+    latest_file_date = latest_file_date.strftime('%Y%m%d') 
+    print(latest_file_date)
+    return(latest_file_date)
+
+
 # connect to DB and get the column names of the table
 
 # extract data from ClinicalTrials.gov
-def get_trial_data():
-    con = None
-    con = psycopg2.connect(database="aact")
-    con.rollback()
-    cursor = con.cursor()
+def get_trial_data(latest_file_date):
+    url = "https://aact.ctti-clinicaltrials.org/static/exported_files/daily/{}_pipe-delimited-export.zip".format(latest_file_date)
+    data_dir = "{}/data".format(pathlib.Path.cwd().parents[0])
+    data_extracted = data_dir + "/{}_extracted".format(latest_file_date)
+    data_path = pathlib.Path.cwd().parents[0] / "{}/{}_pipe-delimited-export.zip".format(data_dir, latest_file_date)
+    # print(data_path)
+    if not os.path.exists(data_path):
+        req = requests.get(url)
+        with open(data_path, 'wb') as download:
+            download.write(req.content)
+        with zipfile.ZipFile(data_path, 'r') as download:
+            download.extractall(data_extracted) 
+    else:
+        print("KG is already up to date.")
+        exit()
 
-    con.autocommit = True # SQL statement is treated as a transaction and is automatically committed right after it is executed
-    # grab the conditions
-    sql = '''SELECT * FROM ctgov.conditions;'''
-    cursor.execute(sql)
-    column_names = [desc[0] for desc in cursor.description]
-    tuples = cursor.fetchall()
-    conditions_df = pd.DataFrame(tuples, columns=column_names)
 
-    #grab the browse_conditions
-    sql = '''SELECT * FROM ctgov.browse_conditions;'''
-    cursor.execute(sql)
-    column_names = [desc[0] for desc in cursor.description]
-    tuples = cursor.fetchall()
-    browse_conditions_df = pd.DataFrame(tuples, columns=column_names)
-
-    #grab the interventions
-    sql = '''SELECT * FROM ctgov.interventions;'''
-    cursor.execute(sql)
-    column_names = [desc[0] for desc in cursor.description]
-    tuples = cursor.fetchall()
-    interventions_df = pd.DataFrame(tuples, columns=column_names)
-
-    #grab the browse_interventions
-    sql = '''SELECT * FROM ctgov.browse_interventions;'''
-    cursor.execute(sql)
-    column_names = [desc[0] for desc in cursor.description]
-    tuples = cursor.fetchall()
-    browse_interventions_df = pd.DataFrame(tuples, columns=column_names)
-
-    con.close()
-
+def process_trial_data():
+    conditions_df = pd.read_csv(data_extracted + '/conditions.txt', sep='|', index_col=False, header=0)
+    interventions_df = pd.read_csv(data_extracted + '/interventions.txt', sep='|', index_col=False, header=0)
+    browse_conditions_df = pd.read_csv(data_extracted + '/browse_conditions.txt', sep='|', index_col=False, header=0)
+    browse_interventions_df = pd.read_csv(data_extracted + '/browse_interventions.txt', sep='|', index_col=False, header=0)
 
     # rename and drop df relevant columns to prepare for merging
     interventions_df = interventions_df.rename(columns={'id': 'int_id',
@@ -291,9 +308,12 @@ def get_mapped_ct_data(metamapped_concept, translation_dict):
 def driver():
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
     #     display(df_dedup.head(100))
-    metamapped_dict = {}
+    
 
-    ct_data = get_trial_data()
+    metamapped_dict = {}
+    latest_file_date = latest_date_download()
+    get_trial_data(latest_file_date)
+    ct_data = process_trial_data()
     ct_preprocessed = preprocess_ct_data(ct_data)
     ct_processed = select_cols_to_preprocess(ct_preprocessed)
     # ct_processed.get("conditions")
