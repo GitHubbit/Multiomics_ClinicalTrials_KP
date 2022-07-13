@@ -33,15 +33,30 @@ STEPS:
 	- interventions [columns = ]
 	- browse_conditions [columns = ]
 	- browse interventions [columns = ]
-2) Pre-process those columns to get non-ASCII char removed (optional, do not use for MetaMap 2020+). Get unique list of conditions and interventions and store in list to feed to MetaMap to get matching CUIs, to turn into CURIEs later
+2) Pre-process those columns to get non-ASCII char removed (optional, do not use for MetaMap 2020+). Get unique list of Conditions and Interventions and store in list to feed to MetaMap to get matching CUIs, to turn into CURIEs later
 3) Start MetaMap SKR Part of Speech Tagger and WSD Word Sense Disambiguation
-4)    
+4) Feed unique Conditions and Interventions to MetaMap python wrapper (pymetamap), return top matching CUI for all concepts and link back to original queried diseases and interventions 
+5) Filter out rows where CUI concept is an exact match (barring upper or lower case differences) for original queried disease or intervention (future releases will allow for matched concepts that may conceptually be correct (human subject matter expert), but may not be exact matches)
+	- ex: 	diabetes type 2 is the orignal search query
+			MetaMap returns: Type II Diabetes Mellitus
+			Since "Type II Diabetes Mellitus" =/= "diabetes type 2" (ignoring case)
+			We do not include this concept and corresponding relationship in the current version of the KG 
+			
+			However, if the original search query is "parkinson's disease",
+			And MetaMap returns "Parkinson's Disease",
+			This record is included since these two concepts are exact matches ignoring case
+			
+			Future releases will strive to accomodate conceptually correct, inexact matches
+5) Create dataframes corresponding to required edges and nodes csv outputs
+	edges file fields: subject, predicate, object, subject_name, object_name, category, nctid, nctid_curie
+	nodes file fields: id, name, category
+6) 
 
 
 
 Description of files and outputs:
-ClinTrials_KG_nodes_v01.csv = 
-ClinTrials_KG_edges_v01.csv = 
+ClinTrials_KG_nodes_v01_2.csv = 
+ClinTrials_KG_edges_v01_2.csv = 
 ClinTrials_ETL.py = 
 Clinical_Trials_playground.ipynb = 
 
