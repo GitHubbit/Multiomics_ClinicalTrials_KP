@@ -1,0 +1,16 @@
+
+{
+    "version": "0.1",
+    "__metadata__": {
+        "url": "https://aact.ctti-clinicaltrials.org/",
+    },
+    "dumper": {
+        "data_url": ["https://aact.ctti-clinicaltrials.org/static/exported_files/daily/20220712_pipe-delimited-export.zip"],
+        "uncompress": true,
+        "release": "version:get_release"
+    },
+    "uploader" : {
+        "parser": "parser:parse_edges",
+        "on_duplicates": "error"
+    }
+}
