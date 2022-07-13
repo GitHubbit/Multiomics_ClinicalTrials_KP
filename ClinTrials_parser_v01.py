@@ -4,9 +4,11 @@
 import pandas as pd
 import json
 
-edges = pd.read_csv("ClinTrials_KG_edges_v01_2.csv", sep='\t')
 
-with open('parser_output.txt', 'w') as file:
+def load_data(data_folder):
+
+	edges = pd.read_csv("ClinTrials_KG_edges_v01_2.csv", sep='\t')
+
     for index, row in edges.iterrows():
         id_dict = {}
         subject_dict = {}
@@ -39,10 +41,9 @@ with open('parser_output.txt', 'w') as file:
         id_dict["subject"] = subject_dict
         id_dict["association"] = association_dict
         id_dict["object"] = object_dict 
+        # yield the JSON one by one
+  		yield id_dict
         
-        json.dump(id_dict, file, indent=4)
-        file.write('\n')
-    
         # print(json.dumps(id_dict, indent=2))
-  
+
     
