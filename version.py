@@ -23,7 +23,7 @@ def get_release(self):
 	        pass
   
 
-	file_list = [f for f in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, f)) and  f.endswith(".zip")]
+	file_list = [f for f in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, f)) and f.endswith(".zip")]
 	file_list = [i.split("_")[0] for i in dir_list]
 	file_list = [get_dates(x) for x in file_list]
 	file_list = list(filter(None, file_list))
