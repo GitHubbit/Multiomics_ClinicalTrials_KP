@@ -5,7 +5,7 @@ import pandas as pd
 import json
 
 
-def load_data(data_folder):
+def parse_edges(data_folder):
 
 	edges = pd.read_csv("ClinTrials_KG_edges_v01_2.csv", sep='\t')
 
