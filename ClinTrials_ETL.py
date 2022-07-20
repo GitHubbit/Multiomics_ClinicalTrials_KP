@@ -14,6 +14,7 @@ import multiprocessing
 import pickle
 import json
 from itertools import repeat
+import requests
 import urllib
 import zipfile
 
