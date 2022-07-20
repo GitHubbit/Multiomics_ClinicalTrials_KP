@@ -15,6 +15,9 @@ import pickle
 import json
 from itertools import repeat
 import requests
+from bs4 import BeautifulSoup
+from datetime import date
+import datetime as dt
 import urllib
 import zipfile
 
@@ -24,9 +27,6 @@ import zipfile
 sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap')
 from pymetamap import MetaMap
 
-
-# import requests
-# from bs4 import BeautifulSoup
 
 # Setup UMLS Server global vars
 # metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
