@@ -38,8 +38,8 @@ def parse_edges(data_folder):
         id_dict["subject"] = subject_dict
         id_dict["association"] = association_dict
         id_dict["object"] = object_dict 
+        
         # yield the JSON one by one
-
         yield id_dict
 
     # print(json.dumps(id_dict, indent=2))
