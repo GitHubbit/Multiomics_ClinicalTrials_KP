@@ -7,7 +7,6 @@
     "dumper": {
         "data_url": ["https://aact.ctti-clinicaltrials.org/static/exported_files/daily/20220223_pipe-delimited-export.zip"],
         "uncompress": true,
-        "release": "version:get_release"
     },
     "uploader" : {
         "parser": "ClinTrials_parser_v01:parse_edges",
