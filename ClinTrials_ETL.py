@@ -21,12 +21,8 @@ import zipfile
 # adding Folder_2/subfolder to the system path
 # sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master')  # for running on local
 sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap')
-
 from pymetamap import MetaMap
 
-# uncomment when switching to Linux
-# sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap/pymetamap')
-# from pymetamap import MetaMap
 
 # import requests
 # from bs4 import BeautifulSoup
@@ -42,8 +38,7 @@ metamap_wsd_server_dir = 'bin/wsdserverctl'
 
 #####	----	****	----	----	****	----	----	****	----    #####
 
-# ACCESSING DATA BY DOWNLOADING STATIC COPY OF DATABASE, AND INSTALLING POSTGRESQL SOFTWARE TO THEN POPULATE DATABASE ON MACHINE
-# THEN CONNECTING TO DB
+# ACCESSING DATA BY downloading flat files
 
 def latest_date_download():
     url = "https://aact.ctti-clinicaltrials.org/pipe_files"
@@ -79,6 +74,11 @@ def latest_date_download():
 
 # extract data from ClinicalTrials.gov
 def get_trial_data(latest_file_date):
+    
+    # global version_date
+    # version_date = latest_file_date
+    # version.get_release(version_date)
+
     url = "https://aact.ctti-clinicaltrials.org/static/exported_files/daily/{}_pipe-delimited-export.zip".format(latest_file_date)
     data_dir = "{}/data".format(pathlib.Path.cwd().parents[0])
     data_extracted = data_dir + "/{}_extracted".format(latest_file_date)
@@ -180,6 +180,11 @@ def select_cols_to_preprocess(ct_preprocessed):
     conditions = list(set(list(ct_preprocessed['subject_name'])))
     interventions = list(filter(None, ct_preprocessed['object_name'].unique()))
 
+    # FOR TESTING ON SUBSET...COMMENT TO RUN ON FULL
+    conditions = random.sample(conditions, 10)
+    interventions = random.sample(conditions, 10)
+
+
     if not all(condition.isascii() for condition in conditions):
         print("Non-ASCII chars are detected in Conditions col from ClinTrial (not checking other cols), proceed with text processing")
         print("This step is unnecessary for MetaMap 2020+")
@@ -207,19 +212,6 @@ def preprocess_cols_for_metamap(text):
 # setup MetaMap
 def start_metamap_servers():
 
-    # uncomment when switching to Linux
-
-    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
-
-    # # Start servers
-    # os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
-    # os.system(metamap_base_dir + metamap_wsd_server_dir + ' start') # Word sense disambiguation 
-     
-    # # Sleep a bit to give time for these servers to start up
-    # sleep(40)
-    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
-
-
     # Start servers
     os.system(metamap_base_dir + metamap_pos_server_dir + ' start') # Part of speech tagger
     os.system(metamap_base_dir + metamap_wsd_server_dir + ' start') # Word sense disambiguation 
@@ -228,16 +220,6 @@ def start_metamap_servers():
     sleep(60)
 
 def stop_metamap_servers():
-    
-    # Uncomment when switching to Linux
-    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
-
-    # # Start servers
-    # os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
-    # os.system(metamap_base_dir + metamap_wsd_server_dir + ' stop') # Word sense disambiguation 
-    
-    # # Sleep a bit to give time for these servers to start up
-    #  ***   -----   ******   -----   ******   -----   ******   -----   ******   -----   *** # 
 
     # Stop servers
     os.system(metamap_base_dir + metamap_pos_server_dir + ' stop') # Part of speech tagger
@@ -320,35 +302,32 @@ def driver():
     # print(ct_processed.get("interventions"))
     start_metamap_servers()
     
+    # uncomment below to run on subset of dicts (see random sampling above)
     import random
-
-    # conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=2000))  # uncomment for testing on subset
-    # interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=2000)) # uncomment for testing on subset
+    conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=2000))  # uncomment for testing on subset
+    interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=2000)) # uncomment for testing on subset
 
     # print(conditions_proc)
-
-
-
     # print(conditions_proc.values())
-
     # print(ct_processed.get("conditions").values())
     # print(type(ct_processed.get("conditions").values()))
 
-    # uncomment below to run on subset of dicts (see random sampling above)
-
-    # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
-    #     zip(list(conditions_proc.values()),
-    #         [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(conditions_proc.values()))))
-    # metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
-    #                                                                          zip(list(interventions_proc.values()),
-    #                                                                              [[None]]*len(list(interventions_proc.values()))))
-
     metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
-        zip(list(ct_processed.get("conditions").values()),
-            [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(ct_processed.get("conditions").values()))))
+        zip(list(conditions_proc.values()),
+            [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(conditions_proc.values()))))
     metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
-                                                                             zip(list(ct_processed.get("interventions").values()),
-                                                                                 [[None]]*len(list(ct_processed.get("interventions").values()))))
+                                                                             zip(list(interventions_proc.values()),
+                                                                                 [[None]]*len(list(interventions_proc.values()))))
+
+
+
+   
+    # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
+    #     zip(list(ct_processed.get("conditions").values()),
+    #         [['SNOMEDCT_US', 'SNOMEDCT_VET', 'ICD10CM', 'ICD10CM', 'ICD10PCS', 'ICD9CM', 'ICD9CM']]*len(list(ct_processed.get("conditions").values()))))
+    # metamapped_interventions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap, 
+    #                                                                          zip(list(ct_processed.get("interventions").values()),
+    #                                                                              [[None]]*len(list(ct_processed.get("interventions").values()))))
 
     # UNCOMMENT TO RUN ON FULL DATASET
     # metamapped_conditions = multiprocessing.Pool(multiprocessing.cpu_count() - 1).starmap(run_metamap,
@@ -442,8 +421,8 @@ def driver():
 
     # write nodes and edges files
 
-    ct_final_mapped.to_csv('ClinTrials_KG_edges_v01_2.csv', sep ='\t', index=False)
-    ct_nodes.to_csv('ClinTrials_KG_nodes_v01_2.csv', sep ='\t', index=False)
+    ct_final_mapped.to_csv('ClinTrials_KG_edges_v01_subset.csv', sep ='\t', index=False)
+    ct_nodes.to_csv('ClinTrials_KG_nodes_v01_subset.csv', sep ='\t', index=False)
 
 
 
