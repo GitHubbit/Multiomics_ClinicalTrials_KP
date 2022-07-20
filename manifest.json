@@ -10,7 +10,7 @@
         "release": "version:get_release"
     },
     "uploader" : {
-        "parser": "parser:parse_edges",
+        "parser": "ClinTrials_parser_v01:parse_edges",
         "on_duplicates": "error"
     }
 }
