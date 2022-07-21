@@ -42,32 +42,53 @@ metamap_wsd_server_dir = 'bin/wsdserverctl'
 # ACCESSING DATA BY downloading flat files
 
 def latest_date_download():
-    url = "https://aact.ctti-clinicaltrials.org/pipe_files"
-    response = requests.get(url)
+
+    # url = "https://aact.ctti-clinicaltrials.org/pipe_files"
+    # response = requests.get(url)
+    # soup = BeautifulSoup(response.text)
+    # upload_dates = []
+    # zip_files = []
+    # links = []
+    # body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
+    # for el in body:
+    #     tags = el.find('a')
+    #     try:
+    #         if 'href' in tags.attrs:   # looking for href inside anchor tag    
+    #             link = "https://aact.ctti-clinicaltrials.org" + tags.get('href')
+    #             links.append(link)
+    #             last_upload = link.split("/")[-1]
+    #             zip_files.append(last_upload)
+    #             date_upload = last_upload.split("_")[0]
+    #             upload_dates.append(date_upload)    # appending link to list of links
+    #     except:    # pass if list missing anchor tag or anchor tag does not has a href params 
+    #         pass
+
+    # upload_dates = [dt.datetime.strptime(date, '%Y%m%d').date() for date in upload_dates] # convert all strings in list into datetime objects
+    # print(upload_dates)
+
+    # latest_file_date = max(upload_dates)
+    # latest_file_date = latest_file_date.strftime('%Y%m%d') 
+    # print(latest_file_date)
+
+
+    # get all the links and associated dates of upload into a dict called date_link
+    url_all = "https://aact.ctti-clinicaltrials.org/pipe_files"
+    response = requests.get(url_all)
     soup = BeautifulSoup(response.text)
-    upload_dates = []
-    zip_files = []
-    links = []
     body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
+    date_link = {}
     for el in body:
         tags = el.find('a')
         try:
-            if 'href' in tags.attrs:   # looking for href inside anchor tag    
-                link = "https://aact.ctti-clinicaltrials.org" + tags.get('href')
-                links.append(link)
-                last_upload = link.split("/")[-1]
-                zip_files.append(last_upload)
-                date_upload = last_upload.split("_")[0]
-                upload_dates.append(date_upload)    # appending link to list of links
-        except:    # pass if list missing anchor tag or anchor tag does not has a href params 
+            zip_name = tags.contents[0]
+            date = zip_name.split("_")[0]
+            date = dt.datetime.strptime(date, '%Y%m%d').date()
+            date_link[date] = tags.get('href')
+        except:
             pass
+    # get the date of the latest upload
+    latest_file_date = max(date_link.keys())
 
-    upload_dates = [dt.datetime.strptime(date, '%Y%m%d').date() for date in upload_dates] # convert all strings in list into datetime objects
-    print(upload_dates)
-
-    latest_file_date = max(upload_dates)
-    latest_file_date = latest_file_date.strftime('%Y%m%d') 
-    print(latest_file_date)
     return(latest_file_date)
 
 
