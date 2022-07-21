@@ -39,7 +39,6 @@ dependencies:
   - jupyter_core=4.10.0
   - jupyterlab_pygments=0.1.2
   - krb5=1.19.2
-  - libcxx=12.0.0
   - libedit=3.1.20210910
   - libffi=3.3
   - libpq=12.9
