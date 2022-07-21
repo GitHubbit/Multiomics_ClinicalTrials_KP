@@ -77,7 +77,7 @@ def latest_date_download():
     # get all the links and associated dates of upload into a dict called date_link
     url_all = "https://aact.ctti-clinicaltrials.org/pipe_files"
     response = requests.get(url_all)
-    soup = BeautifulSoup(response.text)
+    soup = BeautifulSoup(response.text, features="html.parser")
     body = soup.find_all('td', attrs={'class': 'file-archive'}) #Find all
     date_link = {}
     for el in body:
