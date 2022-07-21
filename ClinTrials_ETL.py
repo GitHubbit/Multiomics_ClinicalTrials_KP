@@ -119,8 +119,10 @@ def get_trial_data(latest_file_date):
         print("KG is already up to date.")
         exit()
 
+    return(data_extracted)
 
-def process_trial_data():
+
+def process_trial_data(data_extracted):
     conditions_df = pd.read_csv(data_extracted + '/conditions.txt', sep='|', index_col=False, header=0)
     interventions_df = pd.read_csv(data_extracted + '/interventions.txt', sep='|', index_col=False, header=0)
     browse_conditions_df = pd.read_csv(data_extracted + '/browse_conditions.txt', sep='|', index_col=False, header=0)
@@ -319,8 +321,8 @@ def driver():
 
     metamapped_dict = {}
     latest_file_date = latest_date_download()
-    get_trial_data(latest_file_date)
-    ct_data = process_trial_data()
+    data_extracted = get_trial_data(latest_file_date)
+    ct_data = process_trial_data(data_extracted)
     ct_preprocessed = preprocess_ct_data(ct_data)
     ct_processed = select_cols_to_preprocess(ct_preprocessed)
     # ct_processed.get("conditions")
