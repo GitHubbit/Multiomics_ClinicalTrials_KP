@@ -208,9 +208,9 @@ def select_cols_to_preprocess(ct_preprocessed):
     conditions = list(set(list(ct_preprocessed['subject_name'])))
     interventions = list(filter(None, ct_preprocessed['object_name'].unique()))
 
-    # FOR TESTING ON SUBSET...COMMENT TO RUN ON FULL
-    conditions = random.sample(conditions, 10)
-    interventions = random.sample(conditions, 10)
+    # # FOR TESTING ON SUBSET...COMMENT TO RUN ON FULL
+    # conditions = random.sample(conditions, 10)
+    # interventions = random.sample(conditions, 10)
 
 
     if not all(condition.isascii() for condition in conditions):
@@ -332,8 +332,8 @@ def driver():
     
     # uncomment below to run on subset of dicts (see random sampling above)
     import random
-    conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=2000))  # uncomment for testing on subset
-    interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=2000)) # uncomment for testing on subset
+    conditions_proc = dict(random.sample(list(ct_processed.get("conditions").items()), k=100))  # uncomment for testing on subset
+    interventions_proc = dict(random.sample(list(ct_processed.get("interventions").items()), k=100)) # uncomment for testing on subset
 
     # print(conditions_proc)
     # print(conditions_proc.values())
