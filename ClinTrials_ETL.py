@@ -20,6 +20,9 @@ from datetime import date
 import datetime as dt
 import urllib
 import zipfile
+# import pathlib
+from pathlib import Path
+
 
 
 # adding Folder_2/subfolder to the system path
@@ -102,9 +105,9 @@ def get_trial_data(latest_file_date):
     # version.get_release(version_date)
 
     url = "https://aact.ctti-clinicaltrials.org/static/exported_files/daily/{}_pipe-delimited-export.zip".format(latest_file_date)
-    data_dir = "{}/data".format(pathlib.Path.cwd().parents[0])
+    data_dir = "{}/data".format(Path.cwd().parents[0])
     data_extracted = data_dir + "/{}_extracted".format(latest_file_date)
-    data_path = pathlib.Path.cwd().parents[0] / "{}/{}_pipe-delimited-export.zip".format(data_dir, latest_file_date)
+    data_path = Path.cwd().parents[0] / "{}/{}_pipe-delimited-export.zip".format(data_dir, latest_file_date)
     # print(data_path)
     if not os.path.exists(data_path):
         req = requests.get(url)
