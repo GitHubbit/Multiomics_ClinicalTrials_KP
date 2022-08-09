@@ -7,7 +7,7 @@ import json
 
 def parse_edges(data_folder):
     
-    edges = pd.read_csv("ClinTrials_KG_edges_v01_2.csv", sep='\t')
+    edges = pd.read_csv("ClinTrials_KG_edges_v01_3.csv", sep='\t')
 
     for index, row in edges.iterrows():
         id_dict = {}
