@@ -561,7 +561,7 @@ def split_list_by_char_lim(lst):
     current_length = 0
     for item in lst:
         item_length = len(item)
-        if current_length + item_length > 9000: # max is 10,000 char allowed by MetaMap
+        if current_length + item_length > 9500: # max is 10,000 char allowed by MetaMap
             result.append(current_sublist)
             current_sublist = []
             current_length = 0
