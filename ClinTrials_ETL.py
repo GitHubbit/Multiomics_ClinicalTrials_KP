@@ -166,8 +166,8 @@ def read_raw_ct_data(flag_and_path):
         browse_interventions_df = pd.read_csv(data_extracted + '/browse_interventions.txt', sep='|', index_col=False, header=0)
         
 #     ### GET RID OF....CHEAT LINE FOR TESTING
-#         conditions_df = conditions_df.iloc[:2000]
-#         interventions_df = interventions_df.iloc[:2000]
+        conditions_df = conditions_df.iloc[:5000]
+        interventions_df = interventions_df.iloc[:5000]
 
     return {"conditions": conditions_df, "interventions": interventions_df, "browse_conditions": browse_conditions_df, "browse_interventions": browse_interventions_df}
 
