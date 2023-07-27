@@ -88,8 +88,6 @@ def split_list(lst, sublist_length):
     return [lst[i:i+sublist_length] for i in range(0, len(lst), sublist_length)]
 
 
-
-
 def get_token_sort_ratio(str1, str2):
     """ fuzzy matching explained: https://www.datacamp.com/tutorial/fuzzy-string-python """
     try:
@@ -770,8 +768,9 @@ def compile_and_output(df_dict, ct_terms, remaining_unmapped_possible):
     
 
 def main():
-    flag_and_path = get_raw_ct_data() # uncomment for production
+    # flag_and_path = get_raw_ct_data() # uncomment for production
     # flag_and_path = {'term_program_flag': False, 'data_extracted_path': '/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/07_25_2023_extracted'} # comment for production
+    flag_and_path = {'term_program_flag': False, 'data_extracted_path': './data/07_25_2023_extracted'} # comment for production
     df_dict = read_raw_ct_data(flag_and_path)
     ct_terms = exact_match_mesh(df_dict)
     ct_terms = inexact_match_mesh(df_dict, ct_terms)
