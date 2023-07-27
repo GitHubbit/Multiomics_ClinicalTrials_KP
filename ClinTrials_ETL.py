@@ -724,7 +724,7 @@ def compile_and_output(df_dict, ct_terms, remaining_unmapped_possible):
     # -------    CONDITIONS    ------- #
     all_conditions = df_dict["conditions"][["nct_id", "downcase_name"]]
     conditions_mesh = pd.merge(all_conditions, 
-                               mesh_conditions_per_study,
+                               remaining_unmapped_possible["mesh_conditions_per_study"],
                                how='left',
                                left_on=['nct_id'],
                                right_on = ['nct_id'])
@@ -742,7 +742,7 @@ def compile_and_output(df_dict, ct_terms, remaining_unmapped_possible):
     # -------    INTERVENTIONS    ------- #
     all_interventions = df_dict["interventions"][["nct_id", "downcase_name"]]
     interventions_mesh = pd.merge(all_interventions, 
-                               mesh_interventions_per_study,
+                               remaining_unmapped_possible["mesh_interventions_per_study"],
                                how='left',
                                left_on=['nct_id'],
                                right_on = ['nct_id'])
