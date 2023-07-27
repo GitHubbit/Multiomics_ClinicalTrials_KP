@@ -165,8 +165,8 @@ def read_raw_ct_data(flag_and_path):
         browse_interventions_df = pd.read_csv(data_extracted + '/browse_interventions.txt', sep='|', index_col=False, header=0)
         
 #     ### GET RID OF....CHEAT LINE FOR TESTING
-        conditions_df = conditions_df.iloc[:500]
-        interventions_df = interventions_df.iloc[:500]
+        # conditions_df = conditions_df.iloc[:500]
+        # interventions_df = interventions_df.iloc[:500]
 
     return {"conditions": conditions_df, "interventions": interventions_df, "browse_conditions": browse_conditions_df, "browse_interventions": browse_interventions_df}
 
@@ -455,7 +455,7 @@ def get_ticket_granting_ticket(tgtserverurl, apikey):
 def extract_tgt_ticket(htmlcontent):
 #     print(htmlcontent)
     "Extract ticket granting ticket from HTML."    
-    soup = BeautifulSoup(htmlcontent)
+    soup = BeautifulSoup(htmlcontent, "html.parser")
 #     print(soup.find('form').get("action"))
     cas_url = soup.find("form").get("action")
     "Extract ticket granting ticket out of 'action' attribute"
