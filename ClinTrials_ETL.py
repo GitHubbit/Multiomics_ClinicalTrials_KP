@@ -165,8 +165,8 @@ def read_raw_ct_data(flag_and_path):
         browse_interventions_df = pd.read_csv(data_extracted + '/browse_interventions.txt', sep='|', index_col=False, header=0)
         
 #     ### GET RID OF....CHEAT LINE FOR TESTING
-        # conditions_df = conditions_df.iloc[:5000]
-        # interventions_df = interventions_df.iloc[:5000]
+        conditions_df = conditions_df.iloc[:500]
+        interventions_df = interventions_df.iloc[:500]
 
     return {"conditions": conditions_df, "interventions": interventions_df, "browse_conditions": browse_conditions_df, "browse_interventions": browse_interventions_df}
 
@@ -776,10 +776,10 @@ def convert_seconds_to_hms(seconds):
 
 def main():
     #   ---   timestamps   ---   #
-    current = datetime.now()
-    ts = datetime.timestamp(current)
-    dt = datetime.fromtimestamp(ts)
-    str_date_time = dt.strftime("%d-%m-%Y, %H:%M:%S")
+    current = dt.datetime.now()
+    ts = dt.datetime.timestamp(current)
+    d = dt.datetime.fromtimestamp(ts)
+    str_date_time = d.strftime("%d-%m-%Y, %H:%M:%S")
     print("Timestamp of script start: {}".format(str_date_time))
     #   ---   ----------   ---   #
 
@@ -813,16 +813,15 @@ def main():
     compile_and_output(df_dict, ct_terms, remaining_unmapped_possible)
 
     #   ---   timestamps   ---   #
-    current = datetime.now()
-    ts = datetime.timestamp(current)
-    dt = datetime.fromtimestamp(ts)
-    str_date_time = dt.strftime("%d-%m-%Y, %H:%M:%S")
+    current = dt.datetime.now()
+    ts = dt.datetime.timestamp(current)
+    d = dt.datetime.fromtimestamp(ts)
+    str_date_time = d.strftime("%d-%m-%Y, %H:%M:%S")
     print("Timestamp of script end: {}".format(str_date_time))
     #   ---   ----------   ---   #
 
     end_time = time.time()
-    elapsed_time = end_time - start_time
-    hours, minutes, seconds = convert_seconds_to_hms(elapsed_seconds)
+    hours, minutes, seconds = convert_seconds_to_hms((end_time - start_time))
     print(f"Runtime: {hours} hours, {minutes} minutes, {seconds} seconds")
 
 if __name__ == "__main__":
