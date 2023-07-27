@@ -24,7 +24,7 @@ import zipfile
 from thefuzz import fuzz # fuzzy matching explained: https://www.datacamp.com/tutorial/fuzzy-string-python
 
 global sublist_length 
-sublist_length = 1000 # Name Resolver takes batches of 1000
+sublist_length = 985 # Name Resolver takes batches of 1000
 
 global CAS_SERVERURL 
 global II_SKR_SERVERURL 
