@@ -553,7 +553,8 @@ def run_parallel_threads_mm(terms_chunked, args):
 
         # Retrieve the results as they become available
         output = [future.result() for future in concurrent.futures.as_completed(futures)]
-    mm_dict = reduce(lambda d1, d2: {**d1, **d2}, output) # merge the list of dicts of MetaMap responses in output into 1 dict
+    # mm_dict = reduce(lambda d1, d2: {**d1, **d2}, output) # merge the list of dicts of MetaMap responses in output into 1 dict
+    mm_dict = reduce(lambda d1, d2: {**d1, **d2}, output, {})
     return mm_dict
 
 def split_list_by_char_lim(lst):
