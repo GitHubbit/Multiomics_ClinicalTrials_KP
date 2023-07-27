@@ -12,7 +12,6 @@ import numpy as np
 import pickle
 from functools import reduce
 import time
-# import concurrent
 import concurrent.futures
 import multiprocessing
 import datetime as dt
@@ -117,7 +116,7 @@ def get_raw_ct_data():
     # get all the links and associated dates of upload into a dict called date_link
     url_all = "https://aact.ctti-clinicaltrials.org/pipe_files"
     response = requests.get(url_all)
-    soup = BeautifulSoup(response.text)
+    soup = BeautifulSoup(response.text, "html.parser")
     body = soup.find_all('option') #Find all
     date_link = {}
     for el in body:
@@ -166,8 +165,8 @@ def read_raw_ct_data(flag_and_path):
         browse_interventions_df = pd.read_csv(data_extracted + '/browse_interventions.txt', sep='|', index_col=False, header=0)
         
 #     ### GET RID OF....CHEAT LINE FOR TESTING
-        conditions_df = conditions_df.iloc[:5000]
-        interventions_df = interventions_df.iloc[:5000]
+        # conditions_df = conditions_df.iloc[:5000]
+        # interventions_df = interventions_df.iloc[:5000]
 
     return {"conditions": conditions_df, "interventions": interventions_df, "browse_conditions": browse_conditions_df, "browse_interventions": browse_interventions_df}
 
@@ -766,8 +765,28 @@ def compile_and_output(df_dict, ct_terms, remaining_unmapped_possible):
     unmapped_conditions_possible_terms.to_csv('unmapped_conditions_possible_mappings.tsv', sep="\t", index=False)
     unmapped_interventions_possible_terms.to_csv('unmapped_interventions_possible_mappings.tsv', sep="\t", index=False)
     
+def convert_seconds_to_hms(seconds):
+
+    """ converts the elapsed or run_time to hours, min, sec """
+    hours = seconds // 3600
+    seconds %= 3600
+    minutes = seconds // 60
+    seconds %= 60
+    return hours, minutes, seconds
 
 def main():
+    #   ---   timestamps   ---   #
+    current = datetime.now()
+    ts = datetime.timestamp(current)
+    dt = datetime.fromtimestamp(ts)
+    str_date_time = dt.strftime("%d-%m-%Y, %H:%M:%S")
+    print("Timestamp of script start: {}".format(str_date_time))
+    #   ---   ----------   ---   #
+
+    """ get elapsed time """
+
+    start_time = time.time()
+
     # flag_and_path = get_raw_ct_data() # uncomment for production
     # flag_and_path = {'term_program_flag': False, 'data_extracted_path': '/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/07_25_2023_extracted'} # comment for production
     flag_and_path = {'term_program_flag': False, 'data_extracted_path': os.path.join('.', 'data', '07_27_2023_extracted')} # comment for production
@@ -793,6 +812,18 @@ def main():
 
     compile_and_output(df_dict, ct_terms, remaining_unmapped_possible)
 
+    #   ---   timestamps   ---   #
+    current = datetime.now()
+    ts = datetime.timestamp(current)
+    dt = datetime.fromtimestamp(ts)
+    str_date_time = dt.strftime("%d-%m-%Y, %H:%M:%S")
+    print("Timestamp of script end: {}".format(str_date_time))
+    #   ---   ----------   ---   #
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    hours, minutes, seconds = convert_seconds_to_hms(elapsed_seconds)
+    print(f"Runtime: {hours} hours, {minutes} minutes, {seconds} seconds")
 
 if __name__ == "__main__":
     main()
