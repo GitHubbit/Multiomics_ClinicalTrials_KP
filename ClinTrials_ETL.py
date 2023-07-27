@@ -12,7 +12,8 @@ import numpy as np
 import pickle
 from functools import reduce
 import time
-import concurrent
+# import concurrent
+import concurrent.futures
 import multiprocessing
 import datetime as dt
 from datetime import date
@@ -768,8 +769,8 @@ def compile_and_output(df_dict, ct_terms, remaining_unmapped_possible):
     
 
 def main():
-    flag_and_path = get_raw_ct_data() # uncomment for production
-    # flag_and_path = {'term_program_flag': False, 'data_extracted_path': '/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/06_27_2023_extracted'} # comment for production
+    # flag_and_path = get_raw_ct_data() # uncomment for production
+    flag_and_path = {'term_program_flag': False, 'data_extracted_path': '/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/07_25_2023_extracted'} # comment for production
     df_dict = read_raw_ct_data(flag_and_path)
     ct_terms = exact_match_mesh(df_dict)
     ct_terms = inexact_match_mesh(df_dict, ct_terms)
