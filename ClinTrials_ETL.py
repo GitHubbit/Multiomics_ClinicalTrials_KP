@@ -50,28 +50,34 @@ apikey = apikey.strip("\''")
 
 def get_nr_response(chunk):
     
-    """Runs Name Resolver"""
+    """   Runs Name Resolver   """
     nr_url = 'https://name-resolution-sri.renci.org/lookup'
-    nr_terms = []
+    nr_terms = []   # list to be populated with dictionaries of Name Resolver names and CURIES for each term searched
+    max_retries = 5 
+
     for term in chunk:
+        retries = 0
         nr_term = {}
-        params = {'string':term, 'limit':1} # limit -1 makes this return all available equivalent CURIEs name resolver can give            
-        r = requests.post(nr_url, params=params)
-        try:
-            res = r.json()
-            if res:
-                for key, val in res.items():
-                    nr_term[term] = [key, val[0]]
-                    nr_terms.append(nr_term)
-            else:
-#                 print(term + " unable to be mapped by Name Resolver")
-                pass
-        except Exception as e:
-#             print(e)
-#             print(term + " unable to be mapped by Name Resolver")
-            pass      
-    time.sleep(5)
+        params = {'string':term, 'limit':1} # limit -1 makes this return all available equivalent CURIEs name resolver can give (deprecated)
+        while retries <= max_retries:
+            try:
+                r = requests.post(nr_url, params=params)
+                if r.status_code == 200:
+                    res = r.json()  # process Name Resolver response
+                    for key, val in res.items():
+                        nr_term[term] = [key, val[0]]
+                        nr_terms.append(nr_term) # add Name Resolver name and CURIE to list of dictionaries
+                    break # Break out of the retry loop since the request was successful
+            except (requests.RequestException, ConnectionResetError, OSError) as ex:
+                print(f"Name Resolver request failed for element: {term}. Error: {ex}")
+                retries += 1
+                if retries < max_retries:
+                    print(f"Retrying ({retries}/{max_retries}) after a delay.")
+                    time.sleep(2 ** retries)  # Increase the delay between retries exponentially
+                else:
+                    print(f"Max retries (Name Resolver) reached for term: {term}. Moving to the next term.")
     return nr_terms
+    
 
 def run_parallel_threads_nr(unmapped_chunked):
     # multithread implementation for retrieving Name Resolver responses
