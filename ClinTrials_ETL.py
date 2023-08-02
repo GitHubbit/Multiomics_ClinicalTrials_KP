@@ -55,6 +55,7 @@ def get_nr_response(chunk):
     nr_terms = []   # list to be populated with dictionaries of Name Resolver names and CURIES for each term searched
     max_retries = 5 
 
+    print(f"Chunk being submitted to Name Resolver")
     for term in chunk:
         retries = 0
         nr_term = {}
@@ -77,7 +78,7 @@ def get_nr_response(chunk):
                 else:
                     print(f"Max retries (Name Resolver) reached for term: {term}. Moving to the next term.")
     return nr_terms
-    
+
 
 def run_parallel_threads_nr(unmapped_chunked):
     # multithread implementation for retrieving Name Resolver responses
@@ -493,6 +494,7 @@ def get_redirect_target(resp):
 
 def get_metamap_mappings(chunk, args):
     
+    print(f"Chunk being submitted to MetaMap")
     form = {}
     form['KSOURCE'] = ksource
     form['COMMAND_ARGS'] = args
