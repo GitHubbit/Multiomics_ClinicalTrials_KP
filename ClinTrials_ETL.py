@@ -129,7 +129,6 @@ def wrap(x): # use this to convert string objects to dicts
         pass
 
 
-
 def get_raw_ct_data():
     term_program_flag = True
     global data_dir
@@ -213,6 +212,26 @@ def get_raw_ct_data():
         print("KG is already up to date.")
 
     return {"term_program_flag": term_program_flag, "data_extracted_path": data_extracted, "date_string": date_string}
+
+def read_raw_ct_data(flag_and_path, subset_size):
+    if flag_and_path["term_program_flag"]:
+        print("Exiting program. Assuming KG has already been constructed from most recent data dump from AACT.")
+        exit()
+    else:
+        data_extracted = flag_and_path["data_extracted_path"]
+        # read in pipe-delimited files 
+        conditions_df = pd.read_csv(data_extracted + '/conditions.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+        interventions_df = pd.read_csv(data_extracted + '/interventions.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+        interventions_alts_df = pd.read_csv(data_extracted + '/intervention_other_names.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+
+        if subset_size:   # if a subset size is given, we are running this script on a small subset of the dataset
+            conditions_df = conditions_df.sample(n=subset_size)
+            interventions_df = interventions_df.sample(n=subset_size)
+            interventions_alts_df = interventions_alts_df.sample(n=subset_size)
+    
+    df_dict = {"conditions": conditions_df, "interventions": interventions_df, "interventions_alts": interventions_alts_df}
+    return df_dict
+
 
 
 def cache_manually_selected_terms():    
