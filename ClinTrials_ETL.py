@@ -646,8 +646,8 @@ def output_terms_files():
 if __name__ == "__main__":
     # flag_and_path = get_raw_ct_data() # download raw data
 
-    # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-latest", "date_string": "02_27_2024"}
-    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/", "date_string": "02_27_2024"}
+    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-20240227", "date_string": "02_27_2024"}
+    # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
     subset_size = 20
