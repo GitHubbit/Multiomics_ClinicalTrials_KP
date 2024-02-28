@@ -467,12 +467,9 @@ def run_mappers(term_pair, params, term_type, csv_writer):
     
 def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     
-    LENGTH = len(term_pair_list)  # Number of iterations required to fill progress bar (pbar)
-    pbar = tqdm(total=LENGTH, desc="% {}s mapped".format(term_type), position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
-    
     start_metamap_servers(metamap_dirs) # start the MetaMap servers
-    # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
     terms_left = len(term_pair_list)
+    future_to_pair = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
         for future in concurrent.futures.as_completed(future_to_pair):
@@ -488,6 +485,8 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                 if terms_left % 10 == 0:
                     gc.collect()
                     time.sleep(2)
+    stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
 
 def term_list_to_mappers(dict_new_terms):   
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
@@ -522,25 +521,37 @@ def term_list_to_mappers(dict_new_terms):
     intervention_alts_params = intervention_params # same params as interventions
     # intervention_alternate_term_type = "intervention_alternate"
     
-    n = 20
+    chunksize = 20
     
     if metamap_version[0] >= 20:
         
         cons_processed = list(zip(conditions, conditions))  # these are lists of the same term repeated twice, bc MetaMap 2020 does not require deasciing, so the 2nd term remains unchanged and is a repeat of the first term
         ints_processed = list(zip(interventions, interventions))
         ints_alts_processed = list(zip(interventions_alts, interventions_alts))
-        
-        conditions_chunked = [cons_processed[i:i + n] for i in range(0, len(cons_processed), n)]  
-        interventions_chunked = [ints_processed[i:i + n] for i in range(0, len(ints_processed), n)]  
-        interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
+    
+        conditions_chunked = [cons_processed[i:i + chunksize] for i in range(0, len(cons_processed), chunksize)]  
+        interventions_chunked = [ints_processed[i:i + chunksize] for i in range(0, len(ints_processed), chunksize)]  
+        interventions_alts_chunked = [ints_alts_processed[i:i + chunksize] for i in range(0, len(ints_alts_processed), chunksize)] 
         
         print("MetaMap version >= 2020, conduct mapping on original terms")
+        
+        LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             parallelize_mappers(chunk, condition_params, "condition", csv_writer)
+            pbar.update(n=len(chunk))
+        
+        LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
+            pbar.update(n=len(chunk))
+        
+        LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
+            pbar.update(n=len(chunk))
         
     else:
         print("MetaMap version < 2020, conduct mapping on terms after removing ascii characters")
@@ -553,26 +564,36 @@ def term_list_to_mappers(dict_new_terms):
         ints_processed = list(zip(interventions, deascii_ints))
         ints_alts_processed = list(zip(interventions_alts, deascii_int_alts))
         
-        conditions_chunked = [cons_processed[i:i + n] for i in range(0, len(cons_processed), n)]  
-        interventions_chunked = [ints_processed[i:i + n] for i in range(0, len(ints_processed), n)]  
-        interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
+        conditions_chunked = [cons_processed[i:i + chunksize] for i in range(0, len(cons_processed), chunksize)]  
+        interventions_chunked = [ints_processed[i:i + chunksize] for i in range(0, len(ints_processed), chunksize)]  
+        interventions_alts_chunked = [ints_alts_processed[i:i + chunksize] for i in range(0, len(ints_alts_processed), chunksize)] 
         
+        LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             parallelize_mappers(chunk, condition_params, "condition", csv_writer)
+            pbar.update(n=len(chunk))
+        
+        LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
+            pbar.update(n=len(chunk))
+        
+        LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
+            pbar.update(n=len(chunk))
 
     output.close()
     
     # """ Remove duplicate rows """
-    print("De-duplicating cache")
     mapping_filename = "mapping_cache.tsv"
     cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore')
     cache = cache.drop_duplicates()
     cache.to_csv(mapping_filename, sep="\t", index=False, header=True) # output deduplicated cache terms to TSV
-
+    
 
 def score_mappings():
     print("Scoring cache")
@@ -649,7 +670,7 @@ if __name__ == "__main__":
     # flag_and_path = get_raw_ct_data() # download raw data
 
     flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-20240227", "date_string": "02_27_2024"}
-    # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data", "date_string": "02_27_2024"}
+    # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
     subset_size = 5000
