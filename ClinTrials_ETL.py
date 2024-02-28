@@ -567,6 +567,7 @@ def term_list_to_mappers(dict_new_terms):
     output.close()
     
     # """ Remove duplicate rows """
+    print("De-duplicating cache")
     mapping_filename = "mapping_cache.tsv"
     cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore')
     cache = cache.drop_duplicates()
@@ -574,6 +575,7 @@ def term_list_to_mappers(dict_new_terms):
 
 
 def score_mappings():
+    print("Scoring cache")
 
     def get_max_score(str1, str2, old_score):
         
@@ -612,6 +614,7 @@ def score_mappings():
 
 
 def output_terms_files():
+    print("Generating output files")
 
     """   Get high scorers   """
     cache = pd.read_csv("mapping_cache.tsv", sep='\t', index_col=False, header=0)
@@ -627,7 +630,7 @@ def output_terms_files():
     manual_review = low_scorers[~low_scorers.clintrial_term.isin(highscorers['clintrial_term'].unique().tolist())] # there are terms autoselected that have mappings that didn't pass threshold too, but we want to consider that term mapped. So get rid of these rows too
     mapping_tool_response = manual_review['mapping_tool_response'].apply(lambda x: wrap(x))
     manual_review = manual_review.copy()
-    mapping_tool_response = mapping_tool_response.apply(pd.Series)
+    mapping_tool_response = mapping_tool_response.apply(pd.Series, dtype='object')
     manual_review.loc[:, 'mapping_tool_response_lists'] = mapping_tool_response.values.tolist()
     manual_review.drop('mapping_tool_response', axis=1, inplace=True)
     manual_review = manual_review[["mapping_tool", "term_type", "clintrial_term", "mapping_tool_response_lists", "input_term", "score"]]
