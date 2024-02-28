@@ -524,18 +524,24 @@ def term_list_to_mappers(dict_new_terms):
     # intervention_alternate_term_type = "intervention_alternate"
     
     n = 20
-    conditions_chunked = [conditions[i:i + n] for i in range(0, len(conditions), n)]  
-    interventions_chunked = [interventions[i:i + n] for i in range(0, len(interventions), n)]  
-    interventions_alts_chunked = [interventions_alts[i:i + n] for i in range(0, len(interventions_alts), n)] 
     
     if metamap_version[0] >= 20:
+        
+        cons_processed = list(zip(conditions, conditions))  # these are lists of the same term repeated twice, bc MetaMap 2020 does not require deasciing, so the 2nd term remains unchanged and is a repeat of the first term
+        ints_processed = list(zip(interventions, interventions))
+        ints_alts_processed = list(zip(interventions_alts, interventions_alts))
+        
+        conditions_chunked = [cons_processed[i:i + n] for i in range(0, len(cons_processed), n)]  
+        interventions_chunked = [ints_processed[i:i + n] for i in range(0, len(ints_processed), n)]  
+        interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
+        
         print("MetaMap version >= 2020, conduct mapping on original terms")
         for chunk in conditions_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
+            parallelize_mappers(chunk, condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
+            parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
         for chunk in interventions_alts_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), intervention_alts_params, "alternate_intervention", csv_writer)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
         
     else:
         print("MetaMap version < 2020, conduct mapping on terms after removing ascii characters")
@@ -543,21 +549,21 @@ def term_list_to_mappers(dict_new_terms):
         deascii_cons = deasciier(conditions)
         deascii_ints = deasciier(interventions)
         deascii_int_alts = deasciier(interventions_alts)
-        
-        cons_processed = list(zip(conditions, deascii_cons))
+                
+        cons_processed = list(zip(conditions, deascii_cons)) # these are lists of the original term, and the deasciied term, bc MetaMap 2018 does not process ascii characters
         ints_processed = list(zip(interventions, deascii_ints))
         ints_alts_processed = list(zip(interventions_alts, deascii_int_alts))
         
-        conditons_chunked = [cons_processed[i:i + n] for i in range(0, len(cons_processed), n)]  
+        conditions_chunked = [cons_processed[i:i + n] for i in range(0, len(cons_processed), n)]  
         interventions_chunked = [ints_processed[i:i + n] for i in range(0, len(ints_processed), n)]  
         interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
         
         for chunk in conditions_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
+            parallelize_mappers(chunk, condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
+            parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
         for chunk in interventions_alts_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), intervention_alts_params, "alternate_intervention", csv_writer)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
 
     output.close()
     
