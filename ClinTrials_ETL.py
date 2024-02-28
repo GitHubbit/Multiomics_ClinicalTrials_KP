@@ -474,6 +474,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
     terms_left = len(term_pair_list)
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        print("in concurrrent futures loop")
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
         for future in concurrent.futures.as_completed(future_to_pair):
             term_pair = future_to_pair[future]
@@ -530,6 +531,7 @@ def term_list_to_mappers(dict_new_terms):
     if metamap_version[0] >= 20:
         print("MetaMap version >= 2020, conduct mapping on original terms")
         for chunk in conditions_chunked:
+            print(chunk[:2])
             parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
             parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
@@ -552,7 +554,8 @@ def term_list_to_mappers(dict_new_terms):
         interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
         
         for chunk in conditions_chunked:
-            parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
+            parallelize_mappers(chunk, condition_params, "condition", csv_writer)
+            # parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
             parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
         for chunk in interventions_alts_chunked:
