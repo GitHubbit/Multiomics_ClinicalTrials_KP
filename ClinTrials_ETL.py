@@ -474,7 +474,6 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
     terms_left = len(term_pair_list)
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        print("in concurrrent futures loop")
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
         for future in concurrent.futures.as_completed(future_to_pair):
             term_pair = future_to_pair[future]
