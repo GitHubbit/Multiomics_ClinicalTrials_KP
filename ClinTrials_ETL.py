@@ -220,9 +220,9 @@ def read_raw_ct_data(flag_and_path, subset_size):
     else:
         data_extracted = flag_and_path["data_extracted_path"]
         # read in pipe-delimited files 
-        conditions_df = pd.read_csv(data_extracted + '/conditions.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
-        interventions_df = pd.read_csv(data_extracted + '/interventions.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
-        interventions_alts_df = pd.read_csv(data_extracted + '/intervention_other_names.txt', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+        conditions_df = pd.read_csv(data_extracted + '/conditions.txt.gz', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+        interventions_df = pd.read_csv(data_extracted + '/interventions.txt.gz', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
+        interventions_alts_df = pd.read_csv(data_extracted + '/intervention_other_names.txt.gz', sep='|', index_col=False, header=0, on_bad_lines = 'warn')
 
         if subset_size:   # if a subset size is given, we are running this script on a small subset of the dataset
             conditions_df = conditions_df.sample(n=subset_size)
