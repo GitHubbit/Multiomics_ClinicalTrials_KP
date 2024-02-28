@@ -107,7 +107,9 @@ def stop_metamap_servers(metamap_dirs):
 def check_os():
     if "linux" in sys.platform:
         print("Linux platform detected")
-        metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0])
+        # metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0])
+        # metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm"
+        metamap_base_dir = "../metamap/public_mm"
         metamap_bin_dir = 'bin/metamap20'
     else:
         metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
