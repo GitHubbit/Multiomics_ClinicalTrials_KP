@@ -481,10 +481,9 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                 print(f"Job {term_pair} generated an exception: {exc}")
             finally:
                 terms_left -= 1
-                pbar.update(n=1)
                 if terms_left % 10 == 0:
                     gc.collect()
-                    time.sleep(2)
+                    # time.sleep(2)
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
 
