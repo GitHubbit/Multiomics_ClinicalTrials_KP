@@ -116,11 +116,11 @@ def check_os():
         
     return {"metamap_base_dir":metamap_base_dir, "metamap_bin_dir":metamap_bin_dir} 
 
-# @sleep_and_retry
-# @limits(calls=CALLS, period=RATE_LIMIT)
-# def check_limit():
-#     ''' Empty function just to check for calls to Name Resolver API '''
-#     return
+@sleep_and_retry
+@limits(calls=CALLS, period=RATE_LIMIT)
+def check_limit():
+    ''' Empty function just to check for calls to Name Resolver API '''
+    return
 
 def wrap(x): # use this to convert string objects to dicts 
     try:
