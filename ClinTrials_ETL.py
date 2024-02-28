@@ -602,7 +602,7 @@ def score_mappings():
         write_header = True
         for chunk in reader:
             chunk["mapping_tool_response"] = chunk["mapping_tool_response"].apply(lambda x: wrap(x))
-            mapping_info = chunk["mapping_tool_response"].apply(pd.Series)
+            mapping_info = chunk["mapping_tool_response"].apply(pd.Series, dtype='object')
             chunk["mapped_name"] = mapping_info["mapped_name"]
             chunk["score"] = chunk.apply(lambda x: get_max_score(x['input_term'], x['mapped_name'], x['score']), axis=1) # get score for score rows that are empty/not scored yet
             chunk.drop(["mapped_name"], axis = 1, inplace = True)
