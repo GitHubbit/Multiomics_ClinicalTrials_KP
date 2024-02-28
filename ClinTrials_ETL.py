@@ -531,7 +531,6 @@ def term_list_to_mappers(dict_new_terms):
     if metamap_version[0] >= 20:
         print("MetaMap version >= 2020, conduct mapping on original terms")
         for chunk in conditions_chunked:
-            print(chunk[:2])
             parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
             parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
@@ -554,8 +553,7 @@ def term_list_to_mappers(dict_new_terms):
         interventions_alts_chunked = [ints_alts_processed[i:i + n] for i in range(0, len(ints_alts_processed), n)] 
         
         for chunk in conditions_chunked:
-            parallelize_mappers(chunk, condition_params, "condition", csv_writer)
-            # parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
+            parallelize_mappers(list(zip(chunk, chunk)), condition_params, "condition", csv_writer)
         for chunk in interventions_chunked:
             parallelize_mappers(list(zip(chunk, chunk)), intervention_params, "intervention", csv_writer)
         for chunk in interventions_alts_chunked:
@@ -599,7 +597,7 @@ def score_mappings():
             chunk["mapping_tool_response"] = chunk["mapping_tool_response"].apply(lambda x: wrap(x))
             mapping_info = chunk["mapping_tool_response"].apply(pd.Series)
             chunk["mapped_name"] = mapping_info["mapped_name"]
-            chunk["score"] = chunk.apply(lambda x: int(get_max_score(x['input_term'], x['mapped_name'], x['score'])), axis=1) # get score for score rows that are empty/not scored yet
+            chunk["score"] = chunk.apply(lambda x: get_max_score(x['input_term'], x['mapped_name'], x['score']), axis=1) # get score for score rows that are empty/not scored yet
             chunk.drop(["mapped_name"], axis = 1, inplace = True)
             chunk.to_csv(f'mapping_cache_scored_temp.tsv', sep="\t", index=False, header=write_header, mode = 'a', encoding="utf-8") # output to TSV
             write_header = False
@@ -612,6 +610,7 @@ def output_terms_files():
 
     """   Get high scorers   """
     cache = pd.read_csv("mapping_cache.tsv", sep='\t', index_col=False, header=0)
+    cache['score'] = pd.to_numeric(cache['score'], errors='coerce')
     highscorers = cache[cache['score'] >= 80] 
     # test = highscorers.groupby('clintrial_term')
     idx = highscorers.groupby('clintrial_term')['score'].idxmax()  # group by the clinical trial term and get the highest scoring
@@ -637,13 +636,15 @@ def output_terms_files():
     manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
 
 
+
 if __name__ == "__main__":
     # flag_and_path = get_raw_ct_data() # download raw data
 
-    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-latest", "date_string": "02_27_2024"}
+    # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-latest", "date_string": "02_27_2024"}
+    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = 1000
+    subset_size = 20
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
