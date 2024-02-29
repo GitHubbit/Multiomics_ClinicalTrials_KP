@@ -487,7 +487,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                     terms_left -= 1
                     if terms_left % 10 == 0:
                         gc.collect()
-                        time.sleep(2)
+                        time.sleep(1)
         except concurrent.futures.TimeoutError:
             print("Timeout occurred while processing futures")
             for future, term_pair in future_to_pair.items():  # all futures submitted
@@ -600,7 +600,7 @@ def term_list_to_mappers(dict_new_terms):
     
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
-    cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore')
+    cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore', error_bad_lines=False)
     cache = cache.drop_duplicates()
     cache.to_csv(mapping_filename, sep="\t", index=False, header=True) # output deduplicated cache terms to TSV
     
@@ -683,7 +683,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = 100
+    subset_size = None
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
