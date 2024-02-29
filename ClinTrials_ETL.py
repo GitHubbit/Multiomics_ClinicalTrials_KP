@@ -528,7 +528,7 @@ def term_list_to_mappers(dict_new_terms):
     intervention_alts_params = intervention_params # same params as interventions
     # intervention_alternate_term_type = "intervention_alternate"
     
-    chunksize = 40
+    chunksize = 20
     
     if metamap_version[0] >= 20:
         
