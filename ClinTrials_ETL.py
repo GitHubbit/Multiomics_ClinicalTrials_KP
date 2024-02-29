@@ -471,7 +471,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     start_metamap_servers(metamap_dirs) # start the MetaMap servers
     terms_left = len(term_pair_list)
     future_to_pair = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
         try:
             for future in concurrent.futures.as_completed(future_to_pair, timeout=180): # timeout after 3 min
@@ -528,7 +528,7 @@ def term_list_to_mappers(dict_new_terms):
     intervention_alts_params = intervention_params # same params as interventions
     # intervention_alternate_term_type = "intervention_alternate"
     
-    chunksize = 20
+    chunksize = 50
     
     if metamap_version[0] >= 20:
         
