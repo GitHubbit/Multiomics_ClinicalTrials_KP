@@ -471,7 +471,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     start_metamap_servers(metamap_dirs) # start the MetaMap servers
     terms_left = len(term_pair_list)
     future_to_pair = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
         try:
             for future in concurrent.futures.as_completed(future_to_pair, timeout=180): # timeout after 3 min
@@ -483,7 +483,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                     print(f"Job {term_pair} generated an exception: {exc}")
                 finally:
                     terms_left -= 1
-                    if terms_left % 20 == 0:
+                    if terms_left % 10 == 0:
                         gc.collect()
                         time.sleep(2)
         except concurrent.futures.TimeoutError:
@@ -550,13 +550,13 @@ def term_list_to_mappers(dict_new_terms):
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             pbar.update(n=len(chunk))
@@ -577,19 +577,19 @@ def term_list_to_mappers(dict_new_terms):
         interventions_alts_chunked = [ints_alts_processed[i:i + chunksize] for i in range(0, len(ints_alts_processed), chunksize)] 
         
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             pbar.update(n=len(chunk))
