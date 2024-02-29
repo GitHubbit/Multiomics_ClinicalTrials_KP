@@ -489,7 +489,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
         except concurrent.futures.TimeoutError:
             print("Timeout occurred while processing futures")
             for key, future in future_to_pair.items():
-                if key not in results:
+                if key not in future_to_pair:
                     future.cancel()
 
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
