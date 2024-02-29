@@ -471,13 +471,15 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     start_metamap_servers(metamap_dirs) # start the MetaMap servers
     terms_left = len(term_pair_list)
     future_to_pair = {}
+    results = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-        future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
+        future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list} # key is future, value is the term/term_pair
         try:
             for future in concurrent.futures.as_completed(future_to_pair, timeout=180): # timeout after 3 min
                 term_pair = future_to_pair[future]
                 try:
                     result = future.result()
+                    results[future] = result # key is future, value is result
                     # Process result if needed
                 except Exception as exc:
                     print(f"Job {term_pair} generated an exception: {exc}")
@@ -488,8 +490,8 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                         time.sleep(2)
         except concurrent.futures.TimeoutError:
             print("Timeout occurred while processing futures")
-            for key, future in future_to_pair.items():
-                if key not in future_to_pair:
+            for future, term_pair in future_to_pair.items():  # all futures submitted
+                if future not in results.keys(): # these are futures that didn't complete bc they are not in results
                     future.cancel()
 
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
