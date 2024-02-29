@@ -467,11 +467,6 @@ def run_mappers(term_pair, params, term_type, csv_writer):
         # print(result)
         with csv_writer_lock:
             csv_writer.writerow(result)
-
-    try:
-        time.sleep(5)
-    except:
-        pass
     
 def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     
@@ -480,7 +475,7 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     future_to_pair = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list}
-        for future in concurrent.futures.as_completed(future_to_pair):
+        for future in concurrent.futures.as_completed(future_to_pair, timeout=10):
             term_pair = future_to_pair[future]
             try:
                 result = future.result()
@@ -491,6 +486,10 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
                 terms_left -= 1
                 if terms_left % 10 == 0:
                     gc.collect()
+            try:
+                time.sleep(5)
+            except:
+                pass
 
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
@@ -680,7 +679,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = None
+    subset_size = 50
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
