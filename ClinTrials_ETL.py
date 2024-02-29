@@ -33,6 +33,8 @@ import subprocess
 import shlex
 from collections import Counter
 from ratelimit import limits, sleep_and_retry
+import threading
+csv_writer_lock = threading.Lock()
 
 # %pip install thefuzz
 # %pip install levenshtein
@@ -463,7 +465,8 @@ def run_mappers(term_pair, params, term_type, csv_writer):
         else:
             result.append("unscored")
         # print(result)
-        csv_writer.writerow(result)
+        with csv_writer_lock:
+            csv_writer.writerow(result)
     
 def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     
@@ -659,4 +662,3 @@ if __name__ == "__main__":
     score_mappings()
     output_terms_files()
 
-    
