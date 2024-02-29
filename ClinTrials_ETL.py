@@ -543,7 +543,8 @@ def term_list_to_mappers(dict_new_terms):
         print("MetaMap version >= 2020, conduct mapping on original terms")
         
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             pbar.update(n=len(chunk))
