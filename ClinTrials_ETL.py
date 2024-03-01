@@ -315,8 +315,8 @@ def check_against_cache(df_dict):
     #     interventions_alts_new = list(filter(None, interventions_alts_new))
     #     interventions_alts_new = [str(i) for i in interventions_alts_new]
         
-    # except:
-    #     print("No cache of terms found. Proceeding to map entire KG from scratch")
+    except:
+        print("No cache of terms found. Proceeding to map entire KG from scratch")
     #     conditions_new = conditions_list
     #     interventions_new = interventions_list
     #     interventions_alts_new = interventions_alts_list
