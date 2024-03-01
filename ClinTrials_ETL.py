@@ -284,9 +284,9 @@ def check_against_cache(df_dict):
     except:
         print("No manually selected terms file found")
     
-    try:        
-        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", index_col=False, header=0, on_bad_lines = 'skip')
-        print("here")
+    # try:        
+    cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", index_col=False, header=0, on_bad_lines = 'skip')
+    print("here")
     #     print(cache_df[:20])
         
     #     conditions_cache = cache_df[cache_df["term_type"] == "condition"]
