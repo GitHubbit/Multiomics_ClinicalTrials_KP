@@ -625,7 +625,7 @@ def term_list_to_mappers(dict_new_terms):
     
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
-    cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore', error_bad_lines=False)
+    cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore', on_bad_lines='skip')
     cache = cache.drop_duplicates()
     cache.to_csv(mapping_filename, sep="\t", index=False, header=True) # output deduplicated cache terms to TSV
     
