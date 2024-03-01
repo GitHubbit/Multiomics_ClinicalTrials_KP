@@ -323,7 +323,7 @@ def check_against_cache(df_dict):
         
     # dict_new_terms = {"conditions": conditions_new, "interventions": interventions_new, "interventions_alts": interventions_alts_new}
 
-    return dict_new_terms
+    # return dict_new_terms
 
 
 def get_nr_response(orig_term):
