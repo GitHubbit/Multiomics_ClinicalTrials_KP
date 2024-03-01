@@ -383,8 +383,10 @@ def process_nameresolver_response(nr_response):
 
 def run_mappers(term_pair, params, term_type, csv_writer, terminate_flag):
     # check_count()
-    while not terminate_flag.is_set():
+    # while not terminate_flag.is_set():
 
+        csv_writer = csv.writer(output, delimiter='\t')
+        
         orig_term = term_pair[0]
         input_term = term_pair[1]
         from_mapper = []
@@ -529,11 +531,11 @@ def run_mappers(term_pair, params, term_type, csv_writer, terminate_flag):
 
 #     # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
-def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
+def parallelize_mappers(term_pair_list, params, term_type, output):
     n_workers = 2 * multiprocessing.cpu_count() - 1
     Parallel(n_jobs=n_workers,backend="multiprocessing")(
         delayed(run_mappers)
-        (term_pair, params, term_type, csv_writer) 
+        (term_pair, params, term_type, output) 
   for term_pair in term_pair_list
   )
 
@@ -593,7 +595,8 @@ def term_list_to_mappers(dict_new_terms):
         # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
-            parallelize_mappers(chunk, condition_params, "condition", csv_writer)
+            # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
+            parallelize_mappers(chunk, condition_params, "condition", output)
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
