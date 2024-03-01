@@ -499,9 +499,8 @@ def term_list_to_mappers(dict_new_terms):
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
     if os.path.exists(mapping_filename):
-        # output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
-        # csv_writer = csv.writer(output, delimiter='\t')
-        pass
+        output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
+        output.close()
     else:
         output = open(mapping_filename, 'w+', newline='', encoding='utf-8')
         col_names = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
@@ -602,9 +601,6 @@ def term_list_to_mappers(dict_new_terms):
             pbar.update(n=len(chunk))
 
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-    if output:
-        output.close()
     
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
