@@ -501,31 +501,39 @@ def run_mappers(term_pair, params, term_type, csv_writer, terminate_flag):
 #     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
 
+# def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
+    
+#     # start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
+#     timeout = 120
+#     terminate_flag = threading.Event()
+
+#     # Create a thread for each term pair
+#     threads = []
+#     for term_pair in term_pair_list:
+#         thread = threading.Thread(target=run_mappers, args=(term_pair, params, term_type, csv_writer, terminate_flag))
+#         threads.append(thread)
+#         thread.start()
+
+#     # Wait for all threads to complete or timeout
+#     for thread in threads:
+#         thread.join(timeout)
+
+#         # If the thread is still alive, it has timed out
+#         if thread.is_alive():
+#             print("Thread {} timed out. Terminating...".format(thread.name))
+#             terminate_flag.set()  # Set the flag to terminate the thread
+#     gc.collect()
+
+#     # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
 def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
-    
-    # start_metamap_servers(metamap_dirs) # start the MetaMap servers
-
-    timeout = 120
-    terminate_flag = threading.Event()
-
-    # Create a thread for each term pair
-    threads = []
-    for term_pair in term_pair_list:
-        thread = threading.Thread(target=run_mappers, args=(term_pair, params, term_type, csv_writer, terminate_flag))
-        threads.append(thread)
-        thread.start()
-
-    # Wait for all threads to complete or timeout
-    for thread in threads:
-        thread.join(timeout)
-
-        # If the thread is still alive, it has timed out
-        if thread.is_alive():
-            print("Thread {} timed out. Terminating...".format(thread.name))
-            terminate_flag.set()  # Set the flag to terminate the thread
-    gc.collect()
-    
-    # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+    n_workers = 2 * multiprocessing.cpu_count() - 1
+    Parallel(n_jobs=n_workers,backend="multiprocessing")(
+        delayed(run_mappers)
+        (term_pair, params, term_type, csv_writer) 
+  for term_pair in term_pair_list
+  )
 
 
 
