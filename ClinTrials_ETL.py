@@ -284,46 +284,43 @@ def check_against_cache(df_dict):
     except:
         print("No manually selected terms file found")
     
-    # try:        
-    cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", usecols = ['term_type', 'clintrial_term'], index_col=False, header=0, on_bad_lines = 'skip', encoding="utf-8")
+    try:        
+        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", usecols = ['term_type', 'clintrial_term'], index_col=False, header=0, on_bad_lines = 'skip', encoding="utf-8")
+        
+        conditions_cache = cache_df[cache_df["term_type"] == "condition"]
+        conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
+        conditions_cache = list(set([i.lower() for i in conditions_cache]))
 
-    #     print(cache_df[:20])
         
-    #     conditions_cache = cache_df[cache_df["term_type"] == "condition"]
-    #     conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
-    #     conditions_cache = list(set([i.lower() for i in conditions_cache]))
-    #     print()
-    #     print(conditions_cache[:5])
+        conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
+        conditions_new = list(filter(None, conditions_new))
+        conditions_new = [str(i) for i in conditions_new]
         
-    #     conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
-    #     conditions_new = list(filter(None, conditions_new))
-    #     conditions_new = [str(i) for i in conditions_new]
+        interventions_cache = cache_df[cache_df["term_type"] == "intervention"]
+        interventions_cache = interventions_cache['clintrial_term'].unique().tolist()
+        interventions_cache = list(set([i.lower() for i in interventions_cache]))
         
-    #     interventions_cache = cache_df[cache_df["term_type"] == "intervention"]
-    #     interventions_cache = interventions_cache['clintrial_term'].unique().tolist()
-    #     interventions_cache = list(set([i.lower() for i in interventions_cache]))
+        interventions_new = [x for x in interventions_list if x not in interventions_cache] # find interventions not in the cache (i.g. new interventions to map)
+        interventions_new = list(filter(None, interventions_new))
+        interventions_new = [str(i) for i in interventions_new]
         
-    #     interventions_new = [x for x in interventions_list if x not in interventions_cache] # find interventions not in the cache (i.g. new interventions to map)
-    #     interventions_new = list(filter(None, interventions_new))
-    #     interventions_new = [str(i) for i in interventions_new]
+        interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
+        interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
+        interventions_alts_cache = list(set([i.lower() for i in interventions_alts_cache]))
         
-    #     interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
-    #     interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
-    #     interventions_alts_cache = list(set([i.lower() for i in interventions_alts_cache]))
+        interventions_alts_new = [x for x in interventions_alts_list if x not in interventions_alts_cache] # find interventions_alts not in the cache (i.g. new interventions_alts to map)
+        interventions_alts_new = list(filter(None, interventions_alts_new))
+        interventions_alts_new = [str(i) for i in interventions_alts_new]
         
-    #     interventions_alts_new = [x for x in interventions_alts_list if x not in interventions_alts_cache] # find interventions_alts not in the cache (i.g. new interventions_alts to map)
-    #     interventions_alts_new = list(filter(None, interventions_alts_new))
-    #     interventions_alts_new = [str(i) for i in interventions_alts_new]
+    except:
+        print("No cache of terms found. Proceeding to map entire KG from scratch")
+        conditions_new = conditions_list
+        interventions_new = interventions_list
+        interventions_alts_new = interventions_alts_list
         
-    # except:
-    #     print("No cache of terms found. Proceeding to map entire KG from scratch")
-    #     conditions_new = conditions_list
-    #     interventions_new = interventions_list
-    #     interventions_alts_new = interventions_alts_list
-        
-    # dict_new_terms = {"conditions": conditions_new, "interventions": interventions_new, "interventions_alts": interventions_alts_new}
+    dict_new_terms = {"conditions": conditions_new, "interventions": interventions_new, "interventions_alts": interventions_alts_new}
 
-    # return dict_new_terms
+    return dict_new_terms
 
 
 def get_nr_response(orig_term):
@@ -693,10 +690,9 @@ if __name__ == "__main__":
     metamap_dirs = check_os()
     subset_size = 1000
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
-    check_against_cache(df_dict)
-    # dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
-    # term_list_to_mappers(dict_new_terms)
-    # score_mappings()
-    # output_terms_files()
+    dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
+    term_list_to_mappers(dict_new_terms)
+    score_mappings()
+    output_terms_files()
 
     
