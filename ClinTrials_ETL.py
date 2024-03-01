@@ -693,7 +693,8 @@ if __name__ == "__main__":
     metamap_dirs = check_os()
     subset_size = 1000
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
-    dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
+    check_against_cache(df_dict)
+    # dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     # term_list_to_mappers(dict_new_terms)
     # score_mappings()
     # output_terms_files()
