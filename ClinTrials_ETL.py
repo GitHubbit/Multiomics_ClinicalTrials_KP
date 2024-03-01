@@ -699,6 +699,7 @@ def output_terms_files():
     manual_review['manually_selected_CURIE'] = None # make a column 
     manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
 
+    print("Done\n")
 
 
 if __name__ == "__main__":
