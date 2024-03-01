@@ -381,12 +381,13 @@ def process_nameresolver_response(nr_response):
     return concept_dict
 
 
-def run_mappers(term_pair, params, term_type, csv_writer, terminate_flag):
+def run_mappers(term_pair, params, term_type, mapping_filename):
     # check_count()
     # while not terminate_flag.is_set():
 
+        output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
         csv_writer = csv.writer(output, delimiter='\t')
-        
+
         orig_term = term_pair[0]
         input_term = term_pair[1]
         from_mapper = []
@@ -535,7 +536,7 @@ def parallelize_mappers(term_pair_list, params, term_type, output):
     n_workers = 2 * multiprocessing.cpu_count() - 1
     Parallel(n_jobs=n_workers,backend="multiprocessing")(
         delayed(run_mappers)
-        (term_pair, params, term_type, output) 
+        (term_pair, params, term_type, mapping_file) 
   for term_pair in term_pair_list
   )
 
@@ -551,13 +552,15 @@ def term_list_to_mappers(dict_new_terms):
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
     if os.path.exists(mapping_filename):
-        output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
-        csv_writer = csv.writer(output, delimiter='\t')
+        # output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
+        # csv_writer = csv.writer(output, delimiter='\t')
+        pass
     else:
         output = open(mapping_filename, 'w+', newline='', encoding='utf-8')
         col_names = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
         csv_writer = csv.writer(output, delimiter='\t')
         csv_writer.writerow(col_names)
+        output.close()
 
     #  - Conditions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
@@ -596,7 +599,7 @@ def term_list_to_mappers(dict_new_terms):
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
-            parallelize_mappers(chunk, condition_params, "condition", output)
+            parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
         
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
