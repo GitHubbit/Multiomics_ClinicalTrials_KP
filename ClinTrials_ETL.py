@@ -287,9 +287,13 @@ def check_against_cache(df_dict):
     try:        
         cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", index_col=False, header=0, on_bad_lines = 'warn')
         
+        print(cache_df[:20])
+        
         conditions_cache = cache_df[cache_df["term_type"] == "condition"]
         conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
         conditions_cache = list(set([i.lower() for i in conditions_cache]))
+        print()
+        print(conditions_cache[:5])
         
         conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
         conditions_new = list(filter(None, conditions_new))
@@ -476,62 +480,6 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
         with csv_writer_lock:
             csv_writer.writerow(result)
     
-# def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
-    
-#     start_metamap_servers(metamap_dirs) # start the MetaMap servers
-#     terms_left = len(term_pair_list)
-#     future_to_pair = {}
-#     results = {}
-#     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-#         future_to_pair = {executor.submit(run_mappers, term_pair, params, term_type, csv_writer): term_pair for term_pair in term_pair_list} # key is future, value is the term/term_pair
-#         try:
-#             for future in concurrent.futures.as_completed(future_to_pair, timeout=180): # timeout after 3 min
-#                 term_pair = future_to_pair[future]
-#                 try:
-#                     result = future.result()
-#                     results[future] = result # key is future, value is result
-#                     # Process result if needed
-#                 except Exception as exc:
-#                     print(f"Job {term_pair} generated an exception: {exc}")
-#                 finally:
-#                     terms_left -= 1
-#                     if terms_left % 10 == 0:
-#                         gc.collect()
-#                         time.sleep(1)
-#         except concurrent.futures.TimeoutError:
-#             print("Timeout occurred while processing futures")
-#             for future, term_pair in future_to_pair.items():  # all futures submitted
-#                 if future not in results.keys(): # these are futures that didn't complete bc they are not in results
-#                     future.cancel()
-
-#     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-
-# def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
-    
-#     # start_metamap_servers(metamap_dirs) # start the MetaMap servers
-
-#     timeout = 120
-#     terminate_flag = threading.Event()
-
-#     # Create a thread for each term pair
-#     threads = []
-#     for term_pair in term_pair_list:
-#         thread = threading.Thread(target=run_mappers, args=(term_pair, params, term_type, csv_writer, terminate_flag))
-#         threads.append(thread)
-#         thread.start()
-
-#     # Wait for all threads to complete or timeout
-#     for thread in threads:
-#         thread.join(timeout)
-
-#         # If the thread is still alive, it has timed out
-#         if thread.is_alive():
-#             print("Thread {} timed out. Terminating...".format(thread.name))
-#             terminate_flag.set()  # Set the flag to terminate the thread
-#     gc.collect()
-
-#     # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
 def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
     n_workers = 2 * multiprocessing.cpu_count() - 1
@@ -540,7 +488,6 @@ def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
         (term_pair, params, term_type, mapping_filename) 
   for term_pair in term_pair_list
   )
-
 
 
 def term_list_to_mappers(dict_new_terms):   
@@ -747,8 +694,8 @@ if __name__ == "__main__":
     subset_size = 1000
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
-    term_list_to_mappers(dict_new_terms)
-    score_mappings()
-    output_terms_files()
+    # term_list_to_mappers(dict_new_terms)
+    # score_mappings()
+    # output_terms_files()
 
     
