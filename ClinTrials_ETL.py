@@ -532,11 +532,11 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
 
 #     # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
-def parallelize_mappers(term_pair_list, params, term_type, output):
+def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
     n_workers = 2 * multiprocessing.cpu_count() - 1
     Parallel(n_jobs=n_workers,backend="multiprocessing")(
         delayed(run_mappers)
-        (term_pair, params, term_type, mapping_file) 
+        (term_pair, params, term_type, mapping_filename) 
   for term_pair in term_pair_list
   )
 
