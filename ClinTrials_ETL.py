@@ -266,6 +266,8 @@ def cache_manually_selected_terms():
 
 
 def check_against_cache(df_dict):
+
+    print("Finding new terms to map, compare to cache")
     
     conditions_list = df_dict['conditions'].name.unique().tolist()
     conditions_list = [str(i) for i in conditions_list]
@@ -601,7 +603,8 @@ def term_list_to_mappers(dict_new_terms):
 
     stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
-    output.close()
+    if output:
+        output.close()
     
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
