@@ -285,43 +285,43 @@ def check_against_cache(df_dict):
         print("No manually selected terms file found")
     
     try:        
-        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", index_col=False, header=0, on_bad_lines = 'warn')
+        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", index_col=False, header=0, on_bad_lines = 'skip')
+        print("here")
+    #     print(cache_df[:20])
         
-        print(cache_df[:20])
+    #     conditions_cache = cache_df[cache_df["term_type"] == "condition"]
+    #     conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
+    #     conditions_cache = list(set([i.lower() for i in conditions_cache]))
+    #     print()
+    #     print(conditions_cache[:5])
         
-        conditions_cache = cache_df[cache_df["term_type"] == "condition"]
-        conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
-        conditions_cache = list(set([i.lower() for i in conditions_cache]))
-        print()
-        print(conditions_cache[:5])
+    #     conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
+    #     conditions_new = list(filter(None, conditions_new))
+    #     conditions_new = [str(i) for i in conditions_new]
         
-        conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
-        conditions_new = list(filter(None, conditions_new))
-        conditions_new = [str(i) for i in conditions_new]
+    #     interventions_cache = cache_df[cache_df["term_type"] == "intervention"]
+    #     interventions_cache = interventions_cache['clintrial_term'].unique().tolist()
+    #     interventions_cache = list(set([i.lower() for i in interventions_cache]))
         
-        interventions_cache = cache_df[cache_df["term_type"] == "intervention"]
-        interventions_cache = interventions_cache['clintrial_term'].unique().tolist()
-        interventions_cache = list(set([i.lower() for i in interventions_cache]))
+    #     interventions_new = [x for x in interventions_list if x not in interventions_cache] # find interventions not in the cache (i.g. new interventions to map)
+    #     interventions_new = list(filter(None, interventions_new))
+    #     interventions_new = [str(i) for i in interventions_new]
         
-        interventions_new = [x for x in interventions_list if x not in interventions_cache] # find interventions not in the cache (i.g. new interventions to map)
-        interventions_new = list(filter(None, interventions_new))
-        interventions_new = [str(i) for i in interventions_new]
+    #     interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
+    #     interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
+    #     interventions_alts_cache = list(set([i.lower() for i in interventions_alts_cache]))
         
-        interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
-        interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
-        interventions_alts_cache = list(set([i.lower() for i in interventions_alts_cache]))
+    #     interventions_alts_new = [x for x in interventions_alts_list if x not in interventions_alts_cache] # find interventions_alts not in the cache (i.g. new interventions_alts to map)
+    #     interventions_alts_new = list(filter(None, interventions_alts_new))
+    #     interventions_alts_new = [str(i) for i in interventions_alts_new]
         
-        interventions_alts_new = [x for x in interventions_alts_list if x not in interventions_alts_cache] # find interventions_alts not in the cache (i.g. new interventions_alts to map)
-        interventions_alts_new = list(filter(None, interventions_alts_new))
-        interventions_alts_new = [str(i) for i in interventions_alts_new]
+    # except:
+    #     print("No cache of terms found. Proceeding to map entire KG from scratch")
+    #     conditions_new = conditions_list
+    #     interventions_new = interventions_list
+    #     interventions_alts_new = interventions_alts_list
         
-    except:
-        print("No cache of terms found. Proceeding to map entire KG from scratch")
-        conditions_new = conditions_list
-        interventions_new = interventions_list
-        interventions_alts_new = interventions_alts_list
-        
-    dict_new_terms = {"conditions": conditions_new, "interventions": interventions_new, "interventions_alts": interventions_alts_new}
+    # dict_new_terms = {"conditions": conditions_new, "interventions": interventions_new, "interventions_alts": interventions_alts_new}
 
     return dict_new_terms
 
