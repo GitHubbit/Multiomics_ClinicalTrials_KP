@@ -38,8 +38,6 @@ from threading import Thread
 from joblib import Parallel, delayed
 csv_writer_lock = threading.Lock()
 
-
-
 # %pip install thefuzz
 # %pip install levenshtein
 # %pip install xlsxwriter
@@ -96,7 +94,7 @@ def start_metamap_servers(metamap_dirs):
     with open(os.devnull, "w") as fnull:
         result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
         result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-    sleep(5)
+    sleep(10)
 
 def stop_metamap_servers(metamap_dirs):
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
@@ -108,7 +106,7 @@ def stop_metamap_servers(metamap_dirs):
     with open(os.devnull, "w") as fnull:
         result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
         result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-    sleep(2)  
+    sleep(10)  
     
 def check_os():
     if "linux" in sys.platform:
@@ -493,7 +491,6 @@ def term_list_to_mappers(dict_new_terms):
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
     deasciier = np.vectorize(de_ascii_er) # vectorize function
     
-    start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
 
     # open mapping cache to add mapped terms
@@ -537,6 +534,8 @@ def term_list_to_mappers(dict_new_terms):
         
         print("MetaMap version >= 2020, conduct mapping on original terms")
         
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
         # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -544,20 +543,33 @@ def term_list_to_mappers(dict_new_terms):
             # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
-        
+
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
+
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             # parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
             parallelize_mappers(chunk, condition_params, "intervention", mapping_filename)
             pbar.update(n=len(chunk))
+
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
         
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             parallelize_mappers(chunk, condition_params, "alternate_intervention", mapping_filename)
             pbar.update(n=len(chunk))
+
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
         
     else:
         print("MetaMap version < 2020, conduct mapping on terms after removing ascii characters")
@@ -574,13 +586,20 @@ def term_list_to_mappers(dict_new_terms):
         interventions_chunked = [ints_processed[i:i + chunksize] for i in range(0, len(ints_processed), chunksize)]  
         interventions_alts_chunked = [ints_alts_processed[i:i + chunksize] for i in range(0, len(ints_alts_processed), chunksize)] 
         
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
+
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
         
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
@@ -588,7 +607,12 @@ def term_list_to_mappers(dict_new_terms):
             parallelize_mappers(chunk, condition_params, "intervention", mapping_filename)
 
             pbar.update(n=len(chunk))
+
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+
         
+        start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
@@ -597,7 +621,7 @@ def term_list_to_mappers(dict_new_terms):
 
             pbar.update(n=len(chunk))
 
-    stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
     
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
@@ -684,7 +708,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = None
+    subset_size = 200
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
