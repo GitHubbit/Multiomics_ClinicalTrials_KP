@@ -503,7 +503,7 @@ def run_mappers(term_pair, params, term_type, csv_writer, terminate_flag):
 
 def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
     
-    start_metamap_servers(metamap_dirs) # start the MetaMap servers
+    # start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
     timeout = 120
     terminate_flag = threading.Event()
@@ -523,8 +523,9 @@ def parallelize_mappers(term_pair_list, params, term_type, csv_writer):
         if thread.is_alive():
             print("Thread {} timed out. Terminating...".format(thread.name))
             terminate_flag.set()  # Set the flag to terminate the thread
-
-    stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
+    gc.collect()
+    
+    # stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
 
 
@@ -532,6 +533,9 @@ def term_list_to_mappers(dict_new_terms):
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
     deasciier = np.vectorize(de_ascii_er) # vectorize function
     
+    start_metamap_servers(metamap_dirs) # start the MetaMap servers
+
+
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
     if os.path.exists(mapping_filename):
@@ -626,6 +630,8 @@ def term_list_to_mappers(dict_new_terms):
         for chunk in interventions_alts_chunked:
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             pbar.update(n=len(chunk))
+
+    stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
     output.close()
     
