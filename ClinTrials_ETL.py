@@ -551,7 +551,7 @@ def term_list_to_mappers(dict_new_terms):
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             # parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
-            parallelize_mappers(chunk, condition_params, "intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
@@ -563,7 +563,7 @@ def term_list_to_mappers(dict_new_terms):
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
-            parallelize_mappers(chunk, condition_params, "alternate_intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
@@ -602,7 +602,7 @@ def term_list_to_mappers(dict_new_terms):
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
             # parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
-            parallelize_mappers(chunk, condition_params, "intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
 
             pbar.update(n=len(chunk))
 
@@ -615,7 +615,7 @@ def term_list_to_mappers(dict_new_terms):
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
             # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
-            parallelize_mappers(chunk, condition_params, "alternate_intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
 
             pbar.update(n=len(chunk))
 
