@@ -476,6 +476,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
             # print(result)
         with csv_writer_lock:
             csv_writer.writerow(result)
+    gc.collect()
     
 
 def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
@@ -491,7 +492,6 @@ def term_list_to_mappers(dict_new_terms):
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
     deasciier = np.vectorize(de_ascii_er) # vectorize function
     
-
 
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
@@ -513,7 +513,7 @@ def term_list_to_mappers(dict_new_terms):
     #  - Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
     interventions = dict_new_terms.get("interventions")
-    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
+    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":25} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
 
     #  - Alternate Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
@@ -698,6 +698,8 @@ def output_terms_files():
     # manual_review.drop(["temp"], axis = 1, inplace = True)   # drop the temp column
     manual_review['manually_selected_CURIE'] = None # make a column 
     manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
+
+    sys.stdout.flush() 
 
     print("Done\n")
 
