@@ -93,7 +93,6 @@ def start_metamap_servers(metamap_dirs):
     print(metamap_executable_path_wsd)
     command_pos = [metamap_executable_path_pos, 'start']
     command_wsd = [metamap_executable_path_wsd, 'start']
-    print("MM servers started")
 
     # # Start servers, with open portion redirects output of metamap server printing output to NULL
     # with open(os.devnull, "w") as fnull:
@@ -117,8 +116,8 @@ def check_os():
     if "linux" in sys.platform:
         print("Linux platform detected")
         # metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0])
-        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"
-        metamap_bin_dir = 'bin/metamap20'
+        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm/bin/skrmedpostctl start
+        metamap_bin_dir = 'bin/'
     else:
         metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
         metamap_bin_dir = 'bin/metamap18'
