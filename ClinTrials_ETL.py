@@ -89,14 +89,17 @@ def start_metamap_servers(metamap_dirs):
     
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
+    print(metamap_executable_path_pos)
+    print(metamap_executable_path_wsd)
     command_pos = [metamap_executable_path_pos, 'start']
     command_wsd = [metamap_executable_path_wsd, 'start']
+    print("MM servers started")
 
     # # Start servers, with open portion redirects output of metamap server printing output to NULL
     # with open(os.devnull, "w") as fnull:
     #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
     #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-    sleep(10)
+    sleep(5)
 
 def stop_metamap_servers(metamap_dirs):
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
@@ -108,7 +111,7 @@ def stop_metamap_servers(metamap_dirs):
     # with open(os.devnull, "w") as fnull:
     #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
     #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-    sleep(10)  
+    sleep(5)  
     
 def check_os():
     if "linux" in sys.platform:
