@@ -387,6 +387,8 @@ def process_nameresolver_response(nr_response):
 
 def run_mappers(term_pair, params, term_type, mapping_filename):
 
+    mm, concepts, error, nr_response = None
+
     output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
     csv_writer = csv.writer(output, delimiter='\t')
 
@@ -402,6 +404,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
             term_processing = params["term_processing"],
             ignore_word_order = params["ignore_word_order"],
             strict_model = params["strict_model"],)
+        print(input_term)
         print(concepts)
 
 
