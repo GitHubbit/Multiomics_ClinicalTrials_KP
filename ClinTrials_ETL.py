@@ -395,77 +395,89 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     from_mapper = []
     mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
 
-    # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-
     if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
-        try:
-            concepts,error = mm.extract_concepts([input_term],
-                                                 restrict_to_sts = params["restrict_to_sts"],
-                                                 term_processing = params["term_processing"],
-                                                 ignore_word_order = params["ignore_word_order"],
-                                                 strict_model = params["strict_model"],)
+        concepts,error = mm.extract_concepts(
+            [input_term],
+            restrict_to_sts = params["restrict_to_sts"],
+            term_processing = params["term_processing"],
+            ignore_word_order = params["ignore_word_order"],
+            strict_model = params["strict_model"],)
+        print(concepts)
+
+
+
+
+    # # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+
+    # if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
+    #     try:
+    #         concepts,error = mm.extract_concepts([input_term],
+    #                                              restrict_to_sts = params["restrict_to_sts"],
+    #                                              term_processing = params["term_processing"],
+    #                                              ignore_word_order = params["ignore_word_order"],
+    #                                              strict_model = params["strict_model"],)
                                                     
-            if concepts:   # if MetaMap gives response, process response
-                mapping_tool = "metamap"
-                for concept in concepts:
-                    concept_info = []
-                    new_concept_dict = process_metamap_concept(concept)
-                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-                    from_mapper.append(concept_info)
-            else:   # if MetaMap fails, try using Name Resolver and process response
-                nr_response = get_nr_response(orig_term)
-                if nr_response: # if Name Resolver gives response, process repsonse
-                    input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
-                    mapping_tool = "nameresolver"
-                    concept_info = []
-                    new_concept_dict = process_nameresolver_response(nr_response)
-                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # Add None for score column, empty bc not scored yet
-                    from_mapper.append(concept_info)
-                else:
-                    concept_info = []
-                    # print("Nothing returned from NR or Metamap")
-                    concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-                    from_mapper.append(concept_info)
-        except:
-            concept_info = []
-            # print("Nothing returned from NR or Metamap")
-            concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-            from_mapper.append(concept_info)
+    #         if concepts:   # if MetaMap gives response, process response
+    #             mapping_tool = "metamap"
+    #             for concept in concepts:
+    #                 concept_info = []
+    #                 new_concept_dict = process_metamap_concept(concept)
+    #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+    #                 from_mapper.append(concept_info)
+    #         else:   # if MetaMap fails, try using Name Resolver and process response
+    #             nr_response = get_nr_response(orig_term)
+    #             if nr_response: # if Name Resolver gives response, process repsonse
+    #                 input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
+    #                 mapping_tool = "nameresolver"
+    #                 concept_info = []
+    #                 new_concept_dict = process_nameresolver_response(nr_response)
+    #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # Add None for score column, empty bc not scored yet
+    #                 from_mapper.append(concept_info)
+    #             else:
+    #                 concept_info = []
+    #                 # print("Nothing returned from NR or Metamap")
+    #                 concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+    #                 from_mapper.append(concept_info)
+    #     except:
+    #         concept_info = []
+    #         # print("Nothing returned from NR or Metamap")
+    #         concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+    #         from_mapper.append(concept_info)
             
-    else:   # Else block triggered if mapping Interventions
-        try:
-            concepts,error = mm.extract_concepts([input_term],
-                                                 exclude_sts = params["exclude_sts"],
-                                                 term_processing = params["term_processing"],
-                                                 ignore_word_order = params["ignore_word_order"],
-                                                 strict_model = params["strict_model"],) 
+    # else:   # Else block triggered if mapping Interventions
+    #     try:
+    #         concepts,error = mm.extract_concepts([input_term],
+    #                                              exclude_sts = params["exclude_sts"],
+    #                                              term_processing = params["term_processing"],
+    #                                              ignore_word_order = params["ignore_word_order"],
+    #                                              strict_model = params["strict_model"],) 
                                                    
-            if concepts:   # if MetaMap gives response, process response
-                mapping_tool = "metamap"
-                for concept in concepts:
-                    concept_info = []
-                    new_concept_dict = process_metamap_concept(concept)
-                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-                    from_mapper.append(concept_info)
-            else:   # if MetaMap fails, try using Name Resolver and process response
-                nr_response = get_nr_response(orig_term) 
-                if nr_response: # if Name Resolver gives response, process repsonse
-                    input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
-                    mapping_tool = "nameresolver"
-                    concept_info = []
-                    new_concept_dict = process_nameresolver_response(nr_response)
-                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict])
-                    from_mapper.append(concept_info)
-                else:
-                    concept_info = []
-                    # print("Nothing returned from NR or Metamap")
-                    concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-                    from_mapper.append(concept_info)
-        except:
-            concept_info = []
-            # print("Nothing returned from NR or Metamap")
-            concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-            from_mapper.append(concept_info)
+    #         if concepts:   # if MetaMap gives response, process response
+    #             mapping_tool = "metamap"
+    #             for concept in concepts:
+    #                 concept_info = []
+    #                 new_concept_dict = process_metamap_concept(concept)
+    #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+    #                 from_mapper.append(concept_info)
+    #         else:   # if MetaMap fails, try using Name Resolver and process response
+    #             nr_response = get_nr_response(orig_term) 
+    #             if nr_response: # if Name Resolver gives response, process repsonse
+    #                 input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
+    #                 mapping_tool = "nameresolver"
+    #                 concept_info = []
+    #                 new_concept_dict = process_nameresolver_response(nr_response)
+    #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict])
+    #                 from_mapper.append(concept_info)
+    #             else:
+    #                 concept_info = []
+    #                 # print("Nothing returned from NR or Metamap")
+    #                 concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+    #                 from_mapper.append(concept_info)
+    #     except:
+    #         concept_info = []
+    #         # print("Nothing returned from NR or Metamap")
+    #         concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+    #         from_mapper.append(concept_info)
       
     for result in from_mapper:
         # print(result)
@@ -474,10 +486,18 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
         else:
             result.append("unscored")
         # print(result)
-    with csv_writer_lock:
-        csv_writer.writerow(result)
+    # with csv_writer_lock:
+    #     csv_writer.writerow(result)
     
-    del mm, concepts, error, nr_response, concept_info, from_mapper # memory management
+    if mm:  # memory management
+        del mm
+    if concepts:
+        del concepts
+    if error:
+        del error
+    if nr_response:
+        del nr_response
+    
     gc.collect()
     
 
@@ -716,11 +736,11 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = 40
+    subset_size = None
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
-    score_mappings()
-    output_terms_files()
+    # score_mappings()
+    # output_terms_files()
 
     
