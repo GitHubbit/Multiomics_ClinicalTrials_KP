@@ -92,10 +92,10 @@ def start_metamap_servers(metamap_dirs):
     command_pos = [metamap_executable_path_pos, 'start']
     command_wsd = [metamap_executable_path_wsd, 'start']
 
-    # Start servers, with open portion redirects output of metamap server printing output to NULL
-    with open(os.devnull, "w") as fnull:
-        result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
-        result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
+    # # Start servers, with open portion redirects output of metamap server printing output to NULL
+    # with open(os.devnull, "w") as fnull:
+    #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
+    #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
     sleep(10)
 
 def stop_metamap_servers(metamap_dirs):
@@ -104,10 +104,10 @@ def stop_metamap_servers(metamap_dirs):
     command_pos = [metamap_executable_path_pos, 'stop']
     command_wsd = [metamap_executable_path_wsd, 'stop']
     
-    # Stop servers, with open portion redirects output of metamap server printing output to NULL
-    with open(os.devnull, "w") as fnull:
-        result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
-        result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
+    # # Stop servers, with open portion redirects output of metamap server printing output to NULL
+    # with open(os.devnull, "w") as fnull:
+    #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
+    #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
     sleep(10)  
     
 def check_os():
