@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pandas as pd
 import requests
 import bs4
@@ -474,11 +476,14 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
         # print(result)
     with csv_writer_lock:
         csv_writer.writerow(result)
+    
+    del mm, concepts, error, nr_response, concept_info, from_mapper # memory management
     gc.collect()
     
 
 def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
-    n_workers = 2 * multiprocessing.cpu_count() - 1
+    # n_workers = 2 * multiprocessing.cpu_count() - 1
+    n_workers = 6
     Parallel(n_jobs=n_workers,backend="multiprocessing")(
         delayed(run_mappers)
         (term_pair, params, term_type, mapping_filename) 
@@ -489,7 +494,6 @@ def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
 def term_list_to_mappers(dict_new_terms):   
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
     deasciier = np.vectorize(de_ascii_er) # vectorize function
-    
 
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
@@ -518,7 +522,7 @@ def term_list_to_mappers(dict_new_terms):
     interventions_alts = dict_new_terms.get("interventions_alts")
     intervention_alts_params = intervention_params # same params as interventions
     
-    chunksize = 20
+    chunksize = 10
     
     if metamap_version[0] >= 20:
         
@@ -538,9 +542,10 @@ def term_list_to_mappers(dict_new_terms):
         # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
-            # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
+            del chunk
+            gc.collect()
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
@@ -550,9 +555,10 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
-            # parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
             parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
             pbar.update(n=len(chunk))
+            del chunk
+            gc.collect()
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
@@ -562,9 +568,10 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
-            # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
             pbar.update(n=len(chunk))
+            del chunk
+            gc.collect()
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
@@ -589,9 +596,10 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
-            # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
+            del chunk
+            gc.collect()
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
 
@@ -601,9 +609,9 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
-            # parallelize_mappers(chunk, intervention_params, "intervention", csv_writer)
             parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
-
+            gc.collect()
+            del chunk
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
@@ -614,10 +622,10 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
-            # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
-
             pbar.update(n=len(chunk))
+            del chunk
+            gc.collect()
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
     
@@ -693,7 +701,6 @@ def output_terms_files():
     manual_review.drop('mapping_tool_response_lists', axis=1, inplace=True)
     manual_review = manual_review.sort_values(by=["mapping_tool", "term_type", "clintrial_term", "input_term"], ascending=False)
     manual_review.set_index(["mapping_tool", "term_type", "clintrial_term", "input_term"], inplace=True)   # create index
-    # manual_review.drop(["temp"], axis = 1, inplace = True)   # drop the temp column
     manual_review['manually_selected_CURIE'] = None # make a column 
     manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
 
