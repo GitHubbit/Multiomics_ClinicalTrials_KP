@@ -116,13 +116,15 @@ def check_os():
     if "linux" in sys.platform:
         print("Linux platform detected")
         # metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0])
-        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm/bin/skrmedpostctl start
+        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    
         metamap_bin_dir = 'bin/'
+        metamap_version = '2020'
     else:
         metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
         metamap_bin_dir = 'bin/metamap18'
+        metamap_version = '2018'
         
-    return {"metamap_base_dir":metamap_base_dir, "metamap_bin_dir":metamap_bin_dir} 
+    return {"metamap_base_dir":metamap_base_dir, "metamap_bin_dir":metamap_bin_dir, "metamap_version":metamap_version} 
 
 @sleep_and_retry
 @limits(calls=CALLS, period=RATE_LIMIT)
@@ -517,7 +519,8 @@ def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
 
 
 def term_list_to_mappers(dict_new_terms):   
-    metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
+    metamap_version = metamap_dirs.get('metamap_version')
+
     deasciier = np.vectorize(de_ascii_er) # vectorize function
 
     # open mapping cache to add mapped terms
@@ -549,7 +552,7 @@ def term_list_to_mappers(dict_new_terms):
     
     chunksize = 10
     
-    if metamap_version[0] >= 20:
+    if metamap_version == "2020":
         
         cons_processed = list(zip(conditions, conditions))  # these are lists of the same term repeated twice, bc MetaMap 2020 does not require deasciing, so the 2nd term remains unchanged and is a repeat of the first term
         ints_processed = list(zip(interventions, interventions))
