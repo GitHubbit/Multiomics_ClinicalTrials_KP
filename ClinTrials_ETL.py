@@ -426,7 +426,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
 
         for i in dummy_list:
             input_term = i
-            concepts,error = mm.extract_concepts([input_term])
+            concepts,error = mm.extract_concepts([input_term], restrict_to_sts = params["restrict_to_sts"], term_processing=params["term_processing"])
             print(concepts)
 
         # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
@@ -692,7 +692,6 @@ def term_list_to_mappers(dict_new_terms):
         start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/20, bar_format='{l_bar}{bar:20}{r_bar}{bar:-10b}')  # Init progress bar
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
@@ -850,7 +849,7 @@ if __name__ == "__main__":
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
-    score_mappings()
-    output_terms_files()
+    # score_mappings()
+    # output_terms_files()
 
     
