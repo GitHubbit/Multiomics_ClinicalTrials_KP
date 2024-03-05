@@ -535,12 +535,12 @@ def term_list_to_mappers(dict_new_terms):
     #  - Conditions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
     conditions = dict_new_terms.get("conditions")
-    condition_params = {"restrict_to_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30, "composite_phrase":2} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...
+    condition_params = {"restrict_to_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30, "composite_phrase":"Q"} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...
 
     #  - Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
     interventions = dict_new_terms.get("interventions")
-    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30, "composite_phrase":2} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
+    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30, "composite_phrase":"Q"} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
 
     #  - Alternate Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
