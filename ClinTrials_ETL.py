@@ -89,8 +89,11 @@ def start_metamap_servers(metamap_dirs):
     
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
+    print()
+    print("poserver_dir and wsd dir")
     print(metamap_executable_path_pos)
     print(metamap_executable_path_wsd)
+
     command_pos = [metamap_executable_path_pos, 'start']
     command_wsd = [metamap_executable_path_wsd, 'start']
 
@@ -116,7 +119,7 @@ def check_os():
     if "linux" in sys.platform:
         print("Linux platform detected")
         # metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0])
-        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    
+        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm
         metamap_bin_dir = 'bin/'
         metamap_version = '2020'
     else:
