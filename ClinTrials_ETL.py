@@ -426,7 +426,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
 
         for i in dummy_list:
             input_term = i
-            concepts,error = mm.extract_concepts([input_term], restrict_to_sts = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg'])
+            concepts,error = mm.extract_concepts([input_term])
             print(concepts)
 
         # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
