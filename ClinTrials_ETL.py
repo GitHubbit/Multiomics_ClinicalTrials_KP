@@ -81,12 +81,31 @@ def de_ascii_er(text):
     non_ascii_text = re.sub(pattern, ' ', text)
     return non_ascii_text
 
-def start_metamap_servers(metamap_base_dir, metamap_bin_dir):
+# def start_metamap_servers(metamap_base_dir, metamap_bin_dir):
+#     global metamap_pos_server_dir
+#     global metamap_wsd_server_dir
+#     metamap_pos_server_dir = 'bin/skrmedpostctl' # Part of speech tagger
+#     metamap_wsd_server_dir = 'bin/wsdserverctl' # Word sense disambiguation 
+    
+#     metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
+#     metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
+#     command_pos = [metamap_executable_path_pos, 'start']
+#     command_wsd = [metamap_executable_path_wsd, 'start']
+
+#     # Start servers, with open portion redirects output of metamap server printing output to NULL
+#     with open(os.devnull, "w") as fnull:
+#         result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
+#         result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
+#     sleep(5)
+
+def start_metamap_servers(metamap_dirs):
     global metamap_pos_server_dir
     global metamap_wsd_server_dir
     metamap_pos_server_dir = 'bin/skrmedpostctl' # Part of speech tagger
     metamap_wsd_server_dir = 'bin/wsdserverctl' # Word sense disambiguation 
     
+    metamap_base_dir = metamap_dirs["metamap_base_dir"]
+
     metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
     command_pos = [metamap_executable_path_pos, 'start']
@@ -96,9 +115,12 @@ def start_metamap_servers(metamap_base_dir, metamap_bin_dir):
     with open(os.devnull, "w") as fnull:
         result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
         result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-    sleep(5)
+    sleep(5)    
 
-def stop_metamap_servers(metamap_base_dir, metamap_bin_dir):
+def stop_metamap_servers(metamap_dirs):
+
+    metamap_base_dir = metamap_dirs["metamap_base_dir"]
+
     metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
     command_pos = [metamap_executable_path_pos, 'stop']
