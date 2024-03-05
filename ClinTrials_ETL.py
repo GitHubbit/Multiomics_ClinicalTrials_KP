@@ -88,6 +88,7 @@ def start_metamap_servers(metamap_dirs):
     metamap_wsd_server_dir = 'bin/wsdserverctl' # Word sense disambiguation 
     
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
+    print(metamap_executable_path_pos)
     metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
     # print(metamap_dirs['metamap_base_dir'])
     # print()
@@ -394,7 +395,6 @@ def process_nameresolver_response(nr_response):
 
 
 def run_mappers(term_pair, params, term_type, mapping_filename):
-    print(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
 
     mm, concepts, error, nr_response = None, None, None, None
 
