@@ -81,46 +81,38 @@ def de_ascii_er(text):
     non_ascii_text = re.sub(pattern, ' ', text)
     return non_ascii_text
 
-def start_metamap_servers(metamap_dirs):
+def start_metamap_servers(metamap_base_dir, metamap_bin_dir):
     global metamap_pos_server_dir
     global metamap_wsd_server_dir
     metamap_pos_server_dir = 'bin/skrmedpostctl' # Part of speech tagger
     metamap_wsd_server_dir = 'bin/wsdserverctl' # Word sense disambiguation 
     
-    metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
-    print(metamap_executable_path_pos)
-    metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
-    # print(metamap_dirs['metamap_base_dir'])
-    # print()
-    # print("poserver_dir and wsd dir")
-    # print(metamap_executable_path_pos)
-    # print(metamap_executable_path_wsd)
-
+    metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
+    metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
     command_pos = [metamap_executable_path_pos, 'start']
     command_wsd = [metamap_executable_path_wsd, 'start']
 
-    # # Start servers, with open portion redirects output of metamap server printing output to NULL
-    # with open(os.devnull, "w") as fnull:
-    #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
-    #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
+    # Start servers, with open portion redirects output of metamap server printing output to NULL
+    with open(os.devnull, "w") as fnull:
+        result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
+        result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
     sleep(5)
 
-def stop_metamap_servers(metamap_dirs):
-    metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
-    metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
+def stop_metamap_servers(metamap_base_dir, metamap_bin_dir):
+    metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
+    metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
     command_pos = [metamap_executable_path_pos, 'stop']
     command_wsd = [metamap_executable_path_wsd, 'stop']
     
-    # # Stop servers, with open portion redirects output of metamap server printing output to NULL
-    # with open(os.devnull, "w") as fnull:
-    #     result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
-    #     result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
+    # Stop servers, with open portion redirects output of metamap server printing output to NULL
+    with open(os.devnull, "w") as fnull:
+        result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
+        result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
     sleep(5)  
     
 def check_os():
     if "linux" in sys.platform:
         print("Linux platform detected")
-        # metamap_base_dir = "{}/metamap/".format(pathlib.Path.cwd().parents[0]) # /users/knarsinh/projects/clinical_trials/metamap/public_mm/
         metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm 
         metamap_bin_dir = 'bin/metamap20'
         metamap_version = '2020'
@@ -404,7 +396,9 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     orig_term = term_pair[0]
     input_term = term_pair[1]
     from_mapper = []
-    mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
+    # mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
+    mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs[metamap_bin_dir])
+
 
     if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
         concepts,error = mm.extract_concepts(
