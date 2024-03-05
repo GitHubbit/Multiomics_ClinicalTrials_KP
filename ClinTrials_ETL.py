@@ -89,6 +89,7 @@ def start_metamap_servers(metamap_dirs):
     
     metamap_executable_path_pos = os.path.join(metamap_dirs['metamap_base_dir'], metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_dirs['metamap_base_dir'], metamap_wsd_server_dir)
+    print(metamap_dirs['metamap_base_dir'])
     print()
     print("poserver_dir and wsd dir")
     print(metamap_executable_path_pos)
