@@ -486,10 +486,7 @@ def write_to_cache(metamap_concepts):
     output.close()
 
 
-def run_mappers(term_pair, params, term_type, mapping_filename):
-
-    output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
-    csv_writer = csv.writer(output, delimiter='\t')
+def run_mappers(term_pair, params, term_type):
 
     orig_term = term_pair[0]
     input_term = term_pair[1]
