@@ -570,10 +570,6 @@ def term_list_to_mappers(dict_new_terms):
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
 
-        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-
-        start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -581,10 +577,6 @@ def term_list_to_mappers(dict_new_terms):
             parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
             pbar.update(n=len(chunk))
 
-        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-        
-        start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -619,10 +611,6 @@ def term_list_to_mappers(dict_new_terms):
             parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
             pbar.update(n=len(chunk))
 
-        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-        
-        start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -631,10 +619,6 @@ def term_list_to_mappers(dict_new_terms):
 
             pbar.update(n=len(chunk))
 
-        stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
-
-        
-        start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -733,7 +717,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = 100
+    subset_size = None
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
