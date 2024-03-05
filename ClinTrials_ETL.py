@@ -419,7 +419,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     input_term = term_pair[1]
     from_mapper = []
     # mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
-    mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs[metamap_bin_dir])
+    mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
 
 
     if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
