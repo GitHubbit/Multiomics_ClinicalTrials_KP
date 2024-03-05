@@ -408,134 +408,115 @@ def process_nameresolver_response(nr_response):
     return concept_dict
 
 
+def run_metamap(term_pair, params, term_type):
+    mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
+    
+    from_mapper = []
+    orig_term = term_pair[0]
+    input_term = term_pair[1]
+
+    if term_type == "condition":
+        try:
+            concepts,error = mm.extract_concepts([input_term],
+                restrict_to_sts = params["restrict_to_sts"],
+                term_processing = params["term_processing"],
+                ignore_word_order = params["ignore_word_order"],
+                strict_model = params["strict_model"],)
+            if concepts:
+                mapping_tool = "metamap"
+                for concept in concepts:
+                    concept_info = []
+                    new_concept_dict = process_metamap_concept(concept)
+                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+                    from_mapper.append(concept_info)
+            else:
+                concepts,error = mm.extract_concepts([input_term],
+                    term_processing = params["term_processing"],
+                    ignore_word_order = params["ignore_word_order"])
+                if concepts:
+                    for concept in concepts:
+                        concept_info = []
+                        new_concept_dict = process_metamap_concept(concept)
+                        concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+                        from_mapper.append(concept_info)
+        except:
+            return from_mapper
+        return from_mapper
+    else:
+        try:
+            concepts,error = mm.extract_concepts([input_term],
+                exclude_sts = params["exclude_sts"],
+                term_processing = params["term_processing"],
+                ignore_word_order = params["ignore_word_order"],
+                strict_model = params["strict_model"],) 
+            if concepts:
+                mapping_tool = "metamap"
+                for concept in concepts:
+                    concept_info = []
+                    new_concept_dict = process_metamap_concept(concept)
+                    concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+                    from_mapper.append(concept_info)
+            else:
+                concepts,error = mm.extract_concepts([input_term],
+                    term_processing = params["term_processing"],
+                    ignore_word_order = params["ignore_word_order"])
+                if concepts:
+                    for concept in concepts:
+                        concept_info = []
+                        new_concept_dict = process_metamap_concept(concept)
+                        concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+                        from_mapper.append(concept_info)
+        except:
+            return from_mapper
+        return from_mapper
+
+def write_to_cache(metamap_concepts):
+    mapping_filename = "mapping_cache.tsv"
+    output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
+    csv_writer = csv.writer(output, delimiter='\t')
+    for result in from_mapper:
+        # print(result)
+        if result[0] == "mapping_tools_failed":
+            result.append(-1)
+        else:
+            result.append("unscored")
+            # print(result)
+    with csv_writer_lock:
+        csv_writer.writerow(result)
+    output.close()
+
+
 def run_mappers(term_pair, params, term_type, mapping_filename):
-    # check_count()
-    # while not terminate_flag.is_set():
 
-        # output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
-        # csv_writer = csv.writer(output, delimiter='\t')
+    output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
+    csv_writer = csv.writer(output, delimiter='\t')
 
-        # orig_term = term_pair[0]
-        # input_term = term_pair[1]
-        # from_mapper = []
+    orig_term = term_pair[0]
+    input_term = term_pair[1]
 
-        metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm 
-        metamap_bin_dir = 'bin/metamap20'
-        mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
-        dummy_list = ['time to insertion of radial artery cannulation', 'geriatric population', 'post partum contraception', 'apoe 4']
-
-        for i in dummy_list:
-            input_term = i
-            concepts,error = mm.extract_concepts([input_term], term_processing=True)
-            print(concepts)
-
-        # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
-
-        # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-
-            # if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
-                # try:
-                # concepts,error = mm.extract_concepts([input_term],
-                #                                      restrict_to_sts = params["restrict_to_sts"],
-                #                                      term_processing = params["term_processing"],
-                #                                      ignore_word_order = params["ignore_word_order"],
-                #                                      strict_model = params["strict_model"],)
-                                                        
-                # if concepts:   # if MetaMap gives response, process response
-                #     mapping_tool = "metamap"
-                #     for concept in concepts:
-                #         print(concept)
-                # else:
-                #     print(input_term)
-                        # concept_info = []
-                        # new_concept_dict = process_metamap_concept(concept)
-                        # concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-                        # from_mapper.append(concept_info)
-                # else:   # if MetaMap fails, try using Name Resolver and process response
-                #     nr_response = get_nr_response(orig_term)
-                #     if nr_response: # if Name Resolver gives response, process repsonse
-                #         input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
-                #         mapping_tool = "nameresolver"
-                #         concept_info = []
-                #         new_concept_dict = process_nameresolver_response(nr_response)
-                #         concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # Add None for score column, empty bc not scored yet
-                #         from_mapper.append(concept_info)
-                #     else:
-                #         concept_info = []
-                #         # print("Nothing returned from NR or Metamap")
-                #         concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-                #         from_mapper.append(concept_info)
-        #     except:
-        #         concept_info = []
-        #         # print("Nothing returned from NR or Metamap")
-        #         concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-        #         from_mapper.append(concept_info)
-                
-        # else:   # Else block triggered if mapping Interventions
-        #     try:
-        #         concepts,error = mm.extract_concepts([input_term],
-        #                                              exclude_sts = params["exclude_sts"],
-        #                                              term_processing = params["term_processing"],
-        #                                              ignore_word_order = params["ignore_word_order"],
-        #                                              strict_model = params["strict_model"],) 
-                                                       
-        #         if concepts:   # if MetaMap gives response, process response
-        #             mapping_tool = "metamap"
-        #             for concept in concepts:
-        #                 concept_info = []
-        #                 new_concept_dict = process_metamap_concept(concept)
-        #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
-        #                 from_mapper.append(concept_info)
-        #         else:   # if MetaMap fails, try using Name Resolver and process response
-        #             nr_response = get_nr_response(orig_term) 
-        #             if nr_response: # if Name Resolver gives response, process repsonse
-        #                 input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
-        #                 mapping_tool = "nameresolver"
-        #                 concept_info = []
-        #                 new_concept_dict = process_nameresolver_response(nr_response)
-        #                 concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict])
-        #                 from_mapper.append(concept_info)
-        #             else:
-        #                 concept_info = []
-        #                 # print("Nothing returned from NR or Metamap")
-        #                 concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-        #                 from_mapper.append(concept_info)
-        #     except:
-        #         concept_info = []
-        #         # print("Nothing returned from NR or Metamap")
-        #         concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-        #         from_mapper.append(concept_info)
-          
-        # for result in from_mapper:
-        #     # print(result)
-        #     if result[0] == "mapping_tools_failed":
-        #         result.append(-1)
-        #     else:
-        #         result.append("unscored")
-        #     # print(result)
-        # with csv_writer_lock:
-        #     csv_writer.writerow(result)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
+    from_mapper = run_metamap(term_pair, params, term_type)
+    if metamap_concepts:
+        write_to_cache(metamap_concepts)
+    elif:
+        from_mapper = []
+        nr_response = get_nr_response(orig_term) 
+        if nr_response: # if Name Resolver gives response, process repsonse
+            input_term = orig_term # no preprocessing (lowercasing or deascii-ing) necessary to submit terms to Name Resolver (unlike MetaMap)
+            mapping_tool = "nameresolver"
+            concept_info = []
+            new_concept_dict = process_nameresolver_response(nr_response)
+            concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) 
+            from_mapper.append(concept_info)
+            write_to_cache(from_mapper)
+    else:
+        from_mapper = []
+        concept_info = []
+        # print("Nothing returned from NR or Metamap")
+        concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+        from_mapper.append(concept_info)
+        write_to_cache(from_mapper)
+        
 # def run_mappers(term_pair, params, term_type, mapping_filename):
 #     # check_count()
 #     # while not terminate_flag.is_set():
@@ -637,7 +618,7 @@ def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
 
     Parallel(n_jobs=n_workers,backend="multiprocessing")(
         delayed(run_mappers)
-        (term_pair, params, term_type, mapping_filename) 
+        (term_pair, params, term_type) 
   for term_pair in term_pair_list
   )
           
@@ -694,21 +675,25 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
-            parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            parallelize_mappers(chunk, condition_params, "condition")
             pbar.update(n=len(chunk))
 
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
-            parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
+            # parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_params, "intervention")
             pbar.update(n=len(chunk))
 
 
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
-            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
+            # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention")
+
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
@@ -734,15 +719,18 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in conditions_chunked:
-            # parallelize_mappers(chunk, condition_params, "condition", csv_writer)
-            parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            parallelize_mappers(chunk, condition_params, "condition")
+
             pbar.update(n=len(chunk))
 
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_chunked:
-            parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
+            # parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_params, "intervention")
+
 
             pbar.update(n=len(chunk))
 
@@ -750,9 +738,8 @@ def term_list_to_mappers(dict_new_terms):
         LENGTH = len(ints_alts_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% alternate interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
         for chunk in interventions_alts_chunked:
-            # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", csv_writer)
-            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
-
+            # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
+            parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention")
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
