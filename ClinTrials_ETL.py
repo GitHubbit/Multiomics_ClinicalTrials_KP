@@ -412,36 +412,39 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     # check_count()
     # while not terminate_flag.is_set():
 
-        output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
-        csv_writer = csv.writer(output, delimiter='\t')
+        # output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
+        # csv_writer = csv.writer(output, delimiter='\t')
 
-        orig_term = term_pair[0]
-        input_term = term_pair[1]
-        from_mapper = []
+        # orig_term = term_pair[0]
+        # input_term = term_pair[1]
+        # from_mapper = []
 
         metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm 
         metamap_bin_dir = 'bin/metamap20'
         mm = MetaMap.get_instance(metamap_base_dir + metamap_bin_dir)
+        dummy_list = ['time to insertion of radial artery cannulation', 'geriatric population', 'post partum contraception', 'apoe 4']
 
+        for i in dummy_list:
+            input_term = i
 
         # mm = MetaMap.get_instance(metamap_dirs["metamap_base_dir"] + metamap_dirs["metamap_bin_dir"])
 
         # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
 
-        if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
-            # try:
-            concepts,error = mm.extract_concepts([input_term],
-                                                 restrict_to_sts = params["restrict_to_sts"],
-                                                 term_processing = params["term_processing"],
-                                                 ignore_word_order = params["ignore_word_order"],
-                                                 strict_model = params["strict_model"],)
-                                                    
-            if concepts:   # if MetaMap gives response, process response
-                mapping_tool = "metamap"
-                for concept in concepts:
-                    print(concept)
-            else:
-                print(input_term)
+            if params.get("exclude_sts") is None: # exclude_sts is used for Interventions. restrict_to_sts is used for Conditions. So, the logic is, if we're mapping Conditions, execute "if" part of code. If we're mapping Interventions, execute "else" part of code
+                # try:
+                concepts,error = mm.extract_concepts([input_term],
+                                                     restrict_to_sts = params["restrict_to_sts"],
+                                                     term_processing = params["term_processing"],
+                                                     ignore_word_order = params["ignore_word_order"],
+                                                     strict_model = params["strict_model"],)
+                                                        
+                if concepts:   # if MetaMap gives response, process response
+                    mapping_tool = "metamap"
+                    for concept in concepts:
+                        print(concept)
+                else:
+                    print(input_term)
                         # concept_info = []
                         # new_concept_dict = process_metamap_concept(concept)
                         # concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) # score column is empty, Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
@@ -841,7 +844,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = None
+    subset_size = 10
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
