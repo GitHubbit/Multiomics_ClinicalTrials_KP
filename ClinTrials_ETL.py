@@ -624,7 +624,6 @@ def term_list_to_mappers(dict_new_terms):
     metamap_version = [int(s) for s in re.findall(r'\d+', metamap_dirs.get('metamap_bin_dir'))] # get MetaMap version being run 
     deasciier = np.vectorize(de_ascii_er) # vectorize function
     
-
     # open mapping cache to add mapped terms
     mapping_filename = "mapping_cache.tsv"
     if os.path.exists(mapping_filename):
@@ -668,12 +667,12 @@ def term_list_to_mappers(dict_new_terms):
         
         start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
-        LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
-        for chunk in conditions_chunked:
-            # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
-            parallelize_mappers(chunk, condition_params, "condition")
-            pbar.update(n=len(chunk))
+        # LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
+        # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
+        # for chunk in conditions_chunked:
+        #     # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+        #     parallelize_mappers(chunk, condition_params, "condition")
+        #     pbar.update(n=len(chunk))
 
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
@@ -828,7 +827,7 @@ if __name__ == "__main__":
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
-    subset_size = 10
+    subset_size = 5000
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
