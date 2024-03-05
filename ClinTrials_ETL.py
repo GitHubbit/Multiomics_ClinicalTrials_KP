@@ -498,7 +498,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     from_mapper = run_metamap(term_pair, params, term_type)
     if metamap_concepts:
         write_to_cache(metamap_concepts)
-    elif:
+    else:
         from_mapper = []
         nr_response = get_nr_response(orig_term) 
         if nr_response: # if Name Resolver gives response, process repsonse
@@ -509,14 +509,13 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
             concept_info.extend([mapping_tool, term_type, orig_term, input_term, new_concept_dict]) 
             from_mapper.append(concept_info)
             write_to_cache(from_mapper)
-    else:
-        from_mapper = []
-        concept_info = []
-        # print("Nothing returned from NR or Metamap")
-        concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
-        from_mapper.append(concept_info)
+        else:
+            concept_info = []
+            # print("Nothing returned from NR or Metamap")
+            concept_info.extend(["mapping_tools_failed", term_type, orig_term, input_term, "mapping_tools_failed"])
+            from_mapper.append(concept_info)
         write_to_cache(from_mapper)
-        
+
 # def run_mappers(term_pair, params, term_type, mapping_filename):
 #     # check_count()
 #     # while not terminate_flag.is_set():
