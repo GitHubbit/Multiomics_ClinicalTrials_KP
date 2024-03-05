@@ -611,7 +611,7 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
 #             csv_writer.writerow(result)
     
 
-def parallelize_mappers(term_pair_list, params, term_type, mapping_filename):
+def parallelize_mappers(term_pair_list, params, term_type):
     # n_workers = 2 * multiprocessing.cpu_count() - 1
     n_workers = 6
 
