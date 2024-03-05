@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
-# sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap') # for hypatia
+sys.path.insert(0, '/users/knarsinh/projects/clinical_trials/metamap/pymetamap') # for hypatia
 
-sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master') # for local
+# sys.path.insert(0, '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/pymetamap-master') # for local
 
 from pymetamap import MetaMap  # https://github.com/AnthonyMRios/pymetamap/blob/master/pymetamap/SubprocessBackend.py
 import csv
@@ -13,7 +13,7 @@ import subprocess
 from time import sleep
 
 
-metamap_base_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm 
+metamap_baseex_dir = "/users/knarsinh/projects/clinical_trials/metamap/public_mm/"    # /users/knarsinh/projects/clinical_trials/metamap/public_mm 
 metamap_bin_dir = 'bin/metamap20'
 
 # metamap_base_dir = '/Volumes/TOSHIBA_EXT/ISB/clinical_trials/public_mm/' # for running on local
