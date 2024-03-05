@@ -517,14 +517,14 @@ def run_mappers(term_pair, params, term_type, mapping_filename):
     # with csv_writer_lock:
     #     csv_writer.writerow(result)
     
-    if mm:  # memory management
-        del mm
-    if concepts:
-        del concepts
-    if error:
-        del error
-    if nr_response:
-        del nr_response
+    # if mm:  # memory management
+    #     del mm
+    # if concepts:
+    #     del concepts
+    # if error:
+    #     del error
+    # if nr_response:
+    #     del nr_response
     
     gc.collect()
     
