@@ -470,7 +470,7 @@ def run_metamap(term_pair, params, term_type):
             return from_mapper
         return from_mapper
 
-def write_to_cache(metamap_concepts):
+def write_to_cache(from_mapper):
     mapping_filename = "mapping_cache.tsv"
     output = open(mapping_filename, 'a', newline='', encoding="utf-8") 
     csv_writer = csv.writer(output, delimiter='\t')
@@ -493,8 +493,8 @@ def run_mappers(term_pair, params, term_type):
 
     # Format of output TSV: header = ['mapping_tool', 'term_type', 'clintrial_term', 'input_term', 'mapping_tool_response', 'score']
     from_mapper = run_metamap(term_pair, params, term_type)
-    if metamap_concepts:
-        write_to_cache(metamap_concepts)
+    if from_mapper:
+        write_to_cache(from_mapper)
     else:
         from_mapper = []
         nr_response = get_nr_response(orig_term) 
