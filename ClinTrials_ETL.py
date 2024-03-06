@@ -81,22 +81,6 @@ def de_ascii_er(text):
     non_ascii_text = re.sub(pattern, ' ', text)
     return non_ascii_text
 
-# def start_metamap_servers(metamap_base_dir, metamap_bin_dir):
-#     global metamap_pos_server_dir
-#     global metamap_wsd_server_dir
-#     metamap_pos_server_dir = 'bin/skrmedpostctl' # Part of speech tagger
-#     metamap_wsd_server_dir = 'bin/wsdserverctl' # Word sense disambiguation 
-    
-#     metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
-#     metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
-#     command_pos = [metamap_executable_path_pos, 'start']
-#     command_wsd = [metamap_executable_path_wsd, 'start']
-
-#     # Start servers, with open portion redirects output of metamap server printing output to NULL
-#     with open(os.devnull, "w") as fnull:
-#         result_post = subprocess.call(command_pos, stdout = fnull, stderr = fnull)
-#         result_wsd = subprocess.call(command_wsd, stdout = fnull, stderr = fnull)
-#     sleep(5)
 
 def start_metamap_servers(metamap_dirs):
     global metamap_pos_server_dir
@@ -118,9 +102,7 @@ def start_metamap_servers(metamap_dirs):
     sleep(5)    
 
 def stop_metamap_servers(metamap_dirs):
-
     metamap_base_dir = metamap_dirs["metamap_base_dir"]
-
     metamap_executable_path_pos = os.path.join(metamap_base_dir, metamap_pos_server_dir)
     metamap_executable_path_wsd = os.path.join(metamap_base_dir, metamap_wsd_server_dir)
     command_pos = [metamap_executable_path_pos, 'stop']
@@ -159,90 +141,6 @@ def wrap(x): # use this to convert string objects to dicts
         pass
 
 
-def get_raw_ct_data():
-    term_program_flag = True
-    global data_dir
-    global data_extracted
-    
-    try:
-        # get all the links and associated dates of upload into a dict called date_link
-        url_all = "https://aact.ctti-clinicaltrials.org/download"
-        response = requests.get(url_all)
-        soup = BeautifulSoup(response.text, features="lxml")
-        body = soup.find_all('option') #Find all
-        date_link = {}
-        for el in body:
-            tags = el.find('a')
-            try:
-                zip_name = tags.contents[0].split()[0]
-                date = zip_name.split("_")[0]
-                date = dt.datetime.strptime(date, '%Y%m%d').date()
-                date_link[date] = tags.get('href')
-            except:
-                pass
-        latest_file_date = max(date_link.keys())   # get the date of the latest upload
-        url = date_link[latest_file_date]   # get the corresponding download link of the latest upload so we can download the raw data
-        date_string = latest_file_date.strftime("%m_%d_%Y")
-        data_dir = "{}/data".format(pathlib.Path.cwd())
-        data_extracted = data_dir + "/{}_extracted".format(date_string)
-        data_path = "{}/{}_pipe-delimited-export.zip".format(data_dir, date_string)
-    except:
-        print("continue")
-
-    if not os.path.exists(data_path):   # if folder containing most recent data doesn't exist, download and extract it into data folder
-
-        term_program_flag = False   # flag below for terminating program if latest download exists (KG is assumed up to date)
-        print("Attempting download of Clinical Trial data as of {}\n".format(date_string))
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                with open(data_path, 'wb') as file:
-                    file.write(response.content)
-                print("Finished download of zip")
-                with zipfile.ZipFile(data_path, 'r') as download:
-                    print("Unzipping data")
-                    download.extractall(data_extracted)
-        except:
-            print("Failed to scrape AACT for download. Please navigate to https://aact.ctti-clinicaltrials.org/download and manually download zip file.")
-            print("Please store the downloaded zip in the /data directory. This should be the only item besides the cache file, condition manual review file, and intervention manual review file, in the directory at this time.")
-            done = input("Type Done when done: ")
-            if done == "Done":
-                data_dir = "{}/data".format(pathlib.Path.cwd())
-                # list_of_files = glob.glob(data_dir + "/*") # get all files in directory
-                try:
-                    # latest_file = max(list_of_files, key=os.path.getctime) # get the most recent file in the directory
-                    pattern = os.path.join(data_dir, "*.zip")
-                    zip_file = glob.glob(pattern) # look for file in directory that ends in ".zip"
-                    zip_file = zip_file[0]
-                    print("File found at: ")
-                    print(zip_file)
-                    # print(latest_file)
-                    print("Please make sure this the correct zip file from AACT")
-                    if not os.path.exists(data_extracted):   # if folder of unzipped data does not exist, unzip
-                        try:
-                            with zipfile.ZipFile(zip_file, 'r') as download:
-                                print("Unzipping data into")
-                                cttime = os.path.getctime(zip_file)
-                                date_string = dt.datetime.fromtimestamp(cttime).strftime('%m_%d_%Y')
-                                data_extracted = data_dir + "/{}_extracted".format(date_string)
-                                print(data_extracted)
-                                download.extractall(data_extracted)
-                        except:
-                            pattern = os.path.join(data_dir, "*_extracted")
-                            extracted_file = glob.glob(pattern) # look for file in directory that ends in "_extracted"
-                            data_extracted = extracted_file[0]
-                            extracted_name = os.path.basename(os.path.normpath(extracted_file[0]))
-                            date_string = extracted_name.replace('_extracted', '')
-                            print("Assuming data is already unzipped")
-                        
-                except:
-                    print("Unable to download and extract Clincal Trial data.")
-                    print("Cannot find pipe-delimited zip in /data folder.")
-    else:
-        print("KG is already up to date.")
-
-    return {"term_program_flag": term_program_flag, "data_extracted_path": data_extracted, "date_string": date_string}
-
 def read_raw_ct_data(flag_and_path, subset_size):
     if flag_and_path["term_program_flag"]:
         print("Exiting program. Assuming KG has already been constructed from most recent data dump from AACT.")
@@ -261,7 +159,6 @@ def read_raw_ct_data(flag_and_path, subset_size):
     
     df_dict = {"conditions": conditions_df, "interventions": interventions_df, "interventions_alts": interventions_alts_df}
     return df_dict
-
 
 
 def cache_manually_selected_terms():    
@@ -302,6 +199,8 @@ def check_against_cache(df_dict):
     interventions_alts_list = [str(i) for i in interventions_alts_list]
     interventions_alts_list = list(set([i.lower() for i in interventions_alts_list]))
     
+    cache_df = pd.DataFrame() # initialize empty df --> use to check if reading from tsv works or not
+
     try:
         cache_manually_selected_terms()
     except:
@@ -313,7 +212,7 @@ def check_against_cache(df_dict):
     except:
         print("No cache of terms found. Proceeding to map entire KG from scratch")
 
-    if cache_df:
+    if not cache_df.empty:
         conditions_cache = cache_df[cache_df["term_type"] == "condition"]
         conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
         conditions_cache = list(set([i.lower() for i in conditions_cache]))
