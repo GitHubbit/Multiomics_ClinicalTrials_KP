@@ -208,7 +208,7 @@ def check_against_cache(df_dict):
     
     print("Finding new terms to map, comparing to cache")
     try:
-        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", usecols = ['term_type', 'clintrial_term'], index_col=False, header=0, on_bad_lines = 'skip', encoding="utf-8")
+        cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", usecols = ['term_type', 'clintrial_term'], index_col=False, header=0, on_bad_lines = 'skip', encoding="utf-8", dtype=object)
     except:
         print("No cache of terms found. Proceeding to map entire KG from scratch")
 
