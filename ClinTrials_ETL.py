@@ -215,7 +215,7 @@ def check_against_cache(df_dict):
     if not cache_df.empty:
         conditions_cache = cache_df[cache_df["term_type"] == "condition"]
         conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
-        conditions_cache = list(set([i.lower() for i in conditions_cache]))
+        conditions_cache = list(set([str(i).lower() for i in conditions_cache]))
 
         conditions_new = [x for x in conditions_list if x not in conditions_cache] # find conditions not in the cache (i.g. new conditions to map)
         conditions_new = list(filter(None, conditions_new))
@@ -223,7 +223,7 @@ def check_against_cache(df_dict):
         
         interventions_cache = cache_df[cache_df["term_type"] == "intervention"]
         interventions_cache = interventions_cache['clintrial_term'].unique().tolist()
-        interventions_cache = list(set([i.lower() for i in interventions_cache]))
+        interventions_cache = list(set([str(i).lower() for i in interventions_cache]))
         
         interventions_new = [x for x in interventions_list if x not in interventions_cache] # find interventions not in the cache (i.g. new interventions to map)
         interventions_new = list(filter(None, interventions_new))
@@ -231,7 +231,7 @@ def check_against_cache(df_dict):
         
         interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
         interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
-        interventions_alts_cache = list(set([i.lower() for i in interventions_alts_cache]))
+        interventions_alts_cache = list(set([str(i).lower() for i in interventions_alts_cache]))
         
         interventions_alts_new = [x for x in interventions_alts_list if x not in interventions_alts_cache] # find interventions_alts not in the cache (i.g. new interventions_alts to map)
         interventions_alts_new = list(filter(None, interventions_alts_new))
