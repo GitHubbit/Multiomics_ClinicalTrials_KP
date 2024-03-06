@@ -481,8 +481,8 @@ def write_to_cache(from_mapper):
         else:
             result.append("unscored")
             # print(result)
-    with csv_writer_lock:
-        csv_writer.writerow(result)
+        with csv_writer_lock:
+            csv_writer.writerow(result)
     output.close()
 
 
@@ -571,13 +571,12 @@ def term_list_to_mappers(dict_new_terms):
         
         start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
-        # LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
-        # for chunk in conditions_chunked:
-        #     # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
-        #     parallelize_mappers(chunk, condition_params, "condition")
-        #     pbar.update(n=len(chunk))
-
+        LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
+        for chunk in conditions_chunked:
+            # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            parallelize_mappers(chunk, condition_params, "condition")
+            pbar.update(n=len(chunk))
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -592,7 +591,6 @@ def term_list_to_mappers(dict_new_terms):
         for chunk in interventions_alts_chunked:
             # parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention", mapping_filename)
             parallelize_mappers(chunk, intervention_alts_params, "alternate_intervention")
-
             pbar.update(n=len(chunk))
 
         stop_metamap_servers(metamap_dirs) # stop the MetaMap servers
@@ -629,8 +627,6 @@ def term_list_to_mappers(dict_new_terms):
         for chunk in interventions_chunked:
             # parallelize_mappers(chunk, intervention_params, "intervention", mapping_filename)
             parallelize_mappers(chunk, intervention_params, "intervention")
-
-
             pbar.update(n=len(chunk))
 
 
