@@ -206,13 +206,14 @@ def check_against_cache(df_dict):
     except:
         print("No manually selected terms file found")
     
-    print("Finding new terms to map, comparing to cache")
+    print("Are there new terms to map?")
     try:
         cache_df = pd.read_csv("mapping_cache.tsv", sep ="\t", usecols = ['term_type', 'clintrial_term'], index_col=False, header=0, on_bad_lines = 'skip', encoding="utf-8", dtype=object)
     except:
         print("No cache of terms found. Proceeding to map entire KG from scratch")
 
     if not cache_df.empty: # if the cache is there, which most often it should be, then we proceed with comparing against cache
+        print("Cache found, comparing against it for new terms")
         conditions_cache = cache_df[cache_df["term_type"] == "condition"]
         conditions_cache = conditions_cache['clintrial_term'].unique().tolist()
         conditions_cache = list(set([str(i).lower() for i in conditions_cache]))
@@ -470,12 +471,12 @@ def term_list_to_mappers(dict_new_terms):
         
         start_metamap_servers(metamap_dirs) # start the MetaMap servers
 
-        # LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
-        # pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
-        # for chunk in conditions_chunked:
-        #     # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
-        #     parallelize_mappers(chunk, condition_params, "condition")
-        #     pbar.update(n=len(chunk))
+        LENGTH = len(cons_processed)  # Number of iterations required to fill progress bar (pbar)
+        pbar = tqdm(total=LENGTH, desc="% conditions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
+        for chunk in conditions_chunked:
+            # parallelize_mappers(chunk, condition_params, "condition", mapping_filename)
+            parallelize_mappers(chunk, condition_params, "condition")
+            pbar.update(n=len(chunk))
 
         LENGTH = len(ints_processed)  # Number of iterations required to fill progress bar (pbar)
         pbar = tqdm(total=LENGTH, desc="% interventions mapped", position=0, leave=True, mininterval = LENGTH/40, bar_format='{l_bar}{bar:40}{r_bar}{bar:-10b}')  # Init progress bar
@@ -622,7 +623,7 @@ if __name__ == "__main__":
     print("Starting mapping script")
     # flag_and_path = get_raw_ct_data() # download raw data
 
-    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/AACT-20240227", "date_string": "02_27_2024"}
+    flag_and_path = {"term_program_flag": False, "data_extracted_path": "/15TB_2/gglusman/datasets/clinicaltrials/data/latest", "date_string": "latest"}
     # flag_and_path = {"term_program_flag": False, "data_extracted_path": "/Users/Kamileh/Work/ISB/NCATS_BiomedicalTranslator/Projects/ClinicalTrials/ETL_Python/data/02_27_2024_extracted", "date_string": "02_27_2024"}
     global metamap_dirs
     metamap_dirs = check_os()
@@ -630,7 +631,7 @@ if __name__ == "__main__":
     df_dict = read_raw_ct_data(flag_and_path, subset_size) # read the clinical trial data
     dict_new_terms = check_against_cache(df_dict) # use the existing cache of MetaMapped terms so that only new terms are mapped
     term_list_to_mappers(dict_new_terms)
-    # score_mappings()
-    # output_terms_files()
+    score_mappings()
+    output_terms_files()
 
     
