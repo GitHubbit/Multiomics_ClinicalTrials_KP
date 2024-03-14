@@ -542,7 +542,9 @@ def term_list_to_mappers(dict_new_terms):
     # """ Remove duplicate rows """
     mapping_filename = "mapping_cache.tsv"
     cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore', on_bad_lines='skip')
-    cache = cache.drop_duplicates()
+    cache.sort_values(by=['clintrial_term', 'score'], ascending=False).drop_duplicates(subset=['mapping_tool', 'term_type', 'clintrial_term', 'mapping_tool_response']).sort_index()
+
+    # cache = cache.drop_duplicates()
     cache.to_csv(mapping_filename, sep="\t", index=False, header=True) # output deduplicated cache terms to TSV
     
 
@@ -612,7 +614,9 @@ def output_terms_files():
     manual_review = manual_review.sort_values(by=["mapping_tool", "term_type", "clintrial_term", "input_term"], ascending=False)
     manual_review.set_index(["mapping_tool", "term_type", "clintrial_term", "input_term"], inplace=True)   # create index
     manual_review['manually_selected_CURIE'] = None # make a column 
-    manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
+    manual_review.to_csv('manual_review.tsv', sep="\t", index=False, header=True)
+
+    # manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
 
     sys.stdout.flush() 
 
