@@ -230,7 +230,7 @@ def check_against_cache(df_dict):
         interventions_new = list(filter(None, interventions_new))
         interventions_new = [str(i) for i in interventions_new]
         
-        interventions_alts_cache = cache_df[cache_df["term_type"] == "intervention_alternate"]
+        interventions_alts_cache = cache_df[cache_df["term_type"] == "alternate_intervention"]
         interventions_alts_cache = interventions_alts_cache['clintrial_term'].unique().tolist()
         interventions_alts_cache = list(set([str(i).lower() for i in interventions_alts_cache]))
         
