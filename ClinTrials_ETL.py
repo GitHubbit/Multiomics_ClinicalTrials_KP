@@ -443,12 +443,12 @@ def term_list_to_mappers(dict_new_terms):
     #  - Conditions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
     conditions = dict_new_terms.get("conditions")
-    condition_params = {"restrict_to_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...
+    condition_params = {"restrict_to_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":20} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...
 
     #  - Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
     interventions = dict_new_terms.get("interventions")
-    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":30} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
+    intervention_params = {"exclude_sts":condition_semantic_type_restriction, "term_processing":True, "ignore_word_order":True, "strict_model":False, "prune":20} # strict_model and relaxed_model are presumably opposites? relaxed_model = True is what I want, but that option appears to be broken in Pymetamap (returns no results when used). Using strict_model = False instead...we are also excluding all semantic types of condition bc interventions can be anything and moreover, prune=30 for memory issue (https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/OutOfMemory.pdf)
 
     #  - Alternate Interventions
     condition_semantic_type_restriction = ['acab,anab,cgab,comd,dsyn,inpo,mobd,neop,patf,clna,fndg']  # see https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt for semantic types ("acab,anab,etc.")
@@ -572,7 +572,7 @@ def score_mappings():
         except:
             pass
 
-    with pd.read_csv("mapping_cache.tsv", sep='\t', index_col=False, header=0, on_bad_lines = 'warn', usecols=lambda c: not c.startswith('Unnamed:'), chunksize=1000) as reader:
+    with pd.read_csv("mapping_cache.tsv", sep='\t', index_col=False, header=0, on_bad_lines = 'warn', usecols=lambda c: not c.startswith('Unnamed:'), chunksize=5000) as reader:
         write_header = True
         for chunk in reader:
             chunk["mapping_tool_response"] = chunk["mapping_tool_response"].apply(lambda x: wrap(x))
@@ -583,8 +583,16 @@ def score_mappings():
             chunk.to_csv(f'mapping_cache_scored_temp.tsv', sep="\t", index=False, header=write_header, mode = 'a', encoding="utf-8") # output to TSV
             write_header = False
 
-    os.rename('mapping_cache.tsv','mapping_cache_backup.tsv')       
-    os.rename('mapping_cache_scored_temp.tsv','mapping_cache.tsv')
+    os.rename('mapping_cache.tsv','mapping_cache_backup.tsv')   # create a backup of the cache       
+    os.rename('mapping_cache_scored_temp.tsv','mapping_cache.tsv')   
+
+    # """ Remove duplicate rows """
+    mapping_filename = "mapping_cache.tsv"
+    cache = pd.read_csv(mapping_filename, sep='\t', index_col=False, header=0, encoding_errors='ignore', on_bad_lines='skip')
+    cache = cache.sort_values(by=['clintrial_term', 'score', 'term_type', 'mapping_tool'], ascending=False).drop_duplicates(subset=['mapping_tool', 'term_type', 'clintrial_term', 'mapping_tool_response']).sort_index()
+
+    # cache = cache.drop_duplicates()
+    cache.to_csv(mapping_filename, sep="\t", index=False, header=True) # output deduplicated cache terms to TSV
 
 
 def output_terms_files():
@@ -616,7 +624,7 @@ def output_terms_files():
     manual_review['manually_selected_CURIE'] = None # make a column 
     manual_review.to_csv('manual_review.tsv', sep="\t", index=False, header=True)
 
-    # manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True)
+    # manual_review.to_excel('manual_review.xlsx', engine='xlsxwriter', index=True) # errors out bc excel sheet has too many rows
 
     sys.stdout.flush() 
 
