@@ -554,7 +554,7 @@ def score_mappings():
 
     def get_max_score(str1, str2, old_score):
         
-        cancer_synonyms = ['carcinoma', 'sarcoma', 'melanoma', "malignancy", "neoplasm", "metastasis"] # MetaMap tends to favor "neoplasm"...consider "liver cancer" and "liver neoplasm" as a good match that will fail the score threshold, so handling here
+        cancer_synonyms = ['carcinoma', 'sarcoma', 'melanoma', "malignancy", "neoplasm", "metastasis", "tumor"] # MetaMap tends to favor "neoplasm"...consider "liver cancer" and "liver neoplasm" as a good match that will fail the score threshold, so handling here
         cancer_substring = any(word in str1 or word in str2 for word in cancer_synonyms)
         if cancer_substring:
             # Create a regex pattern to match any of the words in the list
